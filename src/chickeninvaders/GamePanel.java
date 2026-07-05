@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import javax.swing.*;
 
 
@@ -27,6 +28,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private boolean movingUp;
     private boolean movingDown;
 
+    private ArrayList<Bullet> bullets;
+
+    private long lastShotTime;
+    private int shotDelay = 300;
+
     public GamePanel(GameMain gameMain){
 
         this.gameMain = gameMain;
@@ -38,6 +44,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         addKeyListener(this);
 
         gameTimer = new Timer(16,this);
+
+        bullets = new ArrayList<>();
     }
 
     public void startGame(){
@@ -49,6 +57,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         movingRight = false;
         movingDown = false;
         movingUp = false;
+
+        bullets.clear();
+
+        lastShotTime = 0;
 
         requestFocusInWindow();
 
@@ -69,19 +81,61 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     public void updateGame(){
 
-        if(movingLeft){
+        updatePlane();
+        updateBullets();
+    }
+
+    private void updatePlane(){
+
+        if (movingLeft) {
             planeX -= planeSpeed;
         }
-        if(movingRight){
+
+        if (movingRight) {
             planeX += planeSpeed;
         }
-        if(movingDown){
+
+        if (movingDown) {
             planeY += planeSpeed;
         }
-        if(movingUp){
+
+        if (movingUp) {
             planeY -= planeSpeed;
         }
+
         keepPlaneInsideWindow();
+    }
+
+    private void updateBullets(){
+
+        for(int i = bullets.size() - 1; i>=0; --i){
+
+            Bullet bullet = bullets.get(i);
+
+            bullet.update();
+
+            if(bullet.isOutOfScreen()){
+                bullets.remove(i);
+            }
+        }
+    }
+
+    private void shootBullet(){
+
+        long currentTime = System.currentTimeMillis();
+
+        if(currentTime - lastShotTime < shotDelay){
+            return;
+        }
+
+        int bulletX = planeX + planeWidth / 2 - 3;
+        int bulletY = planeY;
+
+        Bullet bullet = new Bullet(bulletX, bulletY);
+
+        bullets.add(bullet);
+
+        lastShotTime = currentTime;
     }
 
     private void keepPlaneInsideWindow(){
@@ -109,6 +163,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         super.paintComponent(g);
 
         drawHud(g);
+        drawBullets(g);
         drawPlane(g);
     }
 
@@ -120,15 +175,25 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         g.drawString("Level: 1",20,30);
         g.drawString("Score: 0",140,30);
         g.drawString("Lives: 3",270,30);
+        g.drawString("Press SPACE to shoot", 410, 30);
 
-        g.drawString("Press ESC to return menu",500,30);
+        g.drawString("ESC: menu",620,30);
+    }
+
+    private void drawBullets(Graphics g){
+
+        for(int i=0; i < bullets.size(); ++i){
+
+            Bullet bullet = bullets.get(i);
+            bullet.draw(g);
+        }
     }
 
     private void drawPlane(Graphics g){
 
         g.setColor(Color.CYAN);
 
-        int[] xPoints = {planeX + planeHeight/2,planeX,planeX + planeWidth};
+        int[] xPoints = {planeX + planeWidth/2,planeX,planeX + planeWidth};
         int[] yPoints ={planeY,planeY + planeHeight,planeY + planeHeight};
 
         g.fillPolygon(xPoints,yPoints,3);
@@ -150,6 +215,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
         if(key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S){
             movingDown = true;
+        }
+
+        if(key == KeyEvent.VK_SPACE){
+            shootBullet();
         }
 
         if(key == KeyEvent.VK_ESCAPE){
