@@ -86,7 +86,7 @@ public class MainMenu extends JPanel{
 
         JButton button = new JButton(text);
 
-        setFont(new Font("Arial",Font.BOLD,20));
+        button.setFont(new Font("Arial",Font.BOLD,20));
 
         button.setFocusPainted(false);
 

@@ -42,8 +42,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     public void startGame(){
 
-        planeX = GameMain.width / 2 - planeWidth / 2;
-        planeY = GameMain.height - 100;
+        planeX = getWidth() / 2 - planeWidth / 2;
+        planeY = getHeight() - 100;
 
         movingLeft = false;
         movingRight = false;
@@ -57,7 +57,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     public void stopGame(){
 
-        gameTimer.stop();;
+        gameTimer.stop();
     }
 
     @Override
@@ -86,22 +86,25 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private void keepPlaneInsideWindow(){
 
+        int panelWidth = getWidth();
+        int panelHeight = getHeight();
+
         if(planeX < 0){
             planeX = 0;
         }
-        if(planeX + planeWidth > GameMain.width){
-            planeX = GameMain.width - planeWidth;
+        if(planeX + planeWidth > panelWidth){
+            planeX = panelWidth - planeWidth;
         }
         if(planeY < 0){
             planeY = 0;
         }
-        if(planeY + planeHeight > GameMain.height){
-            planeY = GameMain.height - planeHeight;
+        if(planeY + planeHeight > panelHeight){
+            planeY = panelHeight - planeHeight;
         }
     }
 
     @Override
-    protected void printComponent(Graphics g){
+    protected void paintComponent(Graphics g){
 
         super.paintComponent(g);
 
@@ -125,7 +128,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         g.setColor(Color.CYAN);
 
-        int[] xPoints = {planeX + planeHeight/2,planeX,planeX + planeWidth/2};
+        int[] xPoints = {planeX + planeHeight/2,planeX,planeX + planeWidth};
         int[] yPoints ={planeY,planeY + planeHeight,planeY + planeHeight};
 
         g.fillPolygon(xPoints,yPoints,3);

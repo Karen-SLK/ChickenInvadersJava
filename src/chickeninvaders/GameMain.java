@@ -4,12 +4,13 @@ import java.awt.CardLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import java.awt.Dimension;
 
 
 public class GameMain {
 
-    public static final int width = 600;
-    public static final int height = 800;
+    public static final int width = 800;
+    public static final int height = 600;
 
     private static final String MENU_CARD = "menu";
     private static final String GAME_CARD = "game";
@@ -39,7 +40,8 @@ public class GameMain {
         mainPanel.add(gamePanel,GAME_CARD);
 
         frame.setContentPane(mainPanel);
-        frame.setSize(width,height);
+        mainPanel.setPreferredSize(new Dimension(width,height));
+        frame.pack();
         frame.setResizable(false);
 
         frame.setLocationRelativeTo(null);
