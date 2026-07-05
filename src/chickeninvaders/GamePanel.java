@@ -30,8 +30,19 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private ArrayList<Bullet> bullets;
 
+    private ArrayList<Enemy> enemies;
+
     private long lastShotTime;
+
     private int shotDelay = 300;
+
+    private int enemySpeed = 1;
+
+    private int enemyDirection = 1;
+
+    private int enemyDownStep = 20;
+
+    private int score;
 
     public GamePanel(GameMain gameMain){
 
@@ -46,6 +57,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         gameTimer = new Timer(16,this);
 
         bullets = new ArrayList<>();
+
+        enemies = new ArrayList<>();
     }
 
     public void startGame(){
@@ -60,6 +73,14 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         bullets.clear();
 
+        enemies.clear();
+
+        score = 0;
+
+        enemyDirection = 1;
+
+        createEnemies();
+
         lastShotTime = 0;
 
         requestFocusInWindow();
@@ -70,6 +91,30 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     public void stopGame(){
 
         gameTimer.stop();
+    }
+
+    public void createEnemies(){
+
+        int rows = 5;
+        int cols = 8;
+
+        int startX = 80;
+        int startY = 80;
+
+        int gapX = 80;
+        int gapY = 55;
+
+        for(int row=0 ; row < rows; ++row){
+            for(int col=0; col < cols; ++col){
+
+                int enemyX = startX + col + gapX;
+                int enemyY = startY + row + gapY;
+
+                Enemy enemy = new Enemy(enemyX,enemyY);
+
+                enemies.add(enemy);
+            }
+        }
     }
 
     @Override
@@ -83,7 +128,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         updatePlane();
         updateBullets();
+        updateEnemies();
+
+        checkBulletEnemyCollision();
+
     }
+
+
 
     private void updatePlane(){
 
@@ -119,6 +170,68 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             }
         }
     }
+
+    private void updateEnemies(){
+
+        boolean hitEdge = false;
+
+        for(int i=0; i<enemies.size(); ++i){
+
+            Enemy enemy = enemies.get(i);
+
+            enemy.update(enemyDirection, enemySpeed);
+
+            if(enemy.getX() < 0 || enemy.getX() + enemy.getWidth() > getWidth()){
+                hitEdge = true;
+            }
+        }
+
+        if(hitEdge){
+
+            enemyDirection = enemyDirection * -1;
+
+            for(int i=0; i<enemies.size(); ++i){
+
+                Enemy enemy = enemies.get(i);
+
+                enemy.moveDown(enemyDownStep);
+            }
+        }
+    }
+
+    private void checkBulletEnemyCollision(){
+
+        for(int i = bullets.size() - 1; i>=0; --i){
+
+            Bullet bullet = bullets.get(i);
+
+            Rectangle bulletBounds = bullet.getBounds();
+
+            for(int j = enemies.size(); j>=0; --j){
+
+                Enemy enemy = enemies.get(i);
+
+                Rectangle enemyBounds = enemy.getBounds();
+
+                if(bulletBounds.intersects(enemyBounds)){
+
+                    bullets.remove(i);
+
+                    boolean enemyDead = enemy.hit();
+
+                    if(enemyDead){
+
+                        score += enemy.getScoreValue();
+
+                        enemies.remove(j);
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
 
     private void shootBullet(){
 
@@ -163,6 +276,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         super.paintComponent(g);
 
         drawHud(g);
+        drawEnemies(g);
         drawBullets(g);
         drawPlane(g);
     }
@@ -178,6 +292,16 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         g.drawString("Press SPACE to shoot", 410, 30);
 
         g.drawString("ESC: menu",620,30);
+    }
+
+    private void drawEnemies(Graphics g){
+
+        for(int i=0; i<enemies.size(); ++i){
+
+            Enemy enemy = enemies.get(i);
+
+            enemy.draw(g);
+        }
     }
 
     private void drawBullets(Graphics g){
