@@ -107,8 +107,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         for(int row=0 ; row < rows; ++row){
             for(int col=0; col < cols; ++col){
 
-                int enemyX = startX + col + gapX;
-                int enemyY = startY + row + gapY;
+                int enemyX = startX + col * gapX;
+                int enemyY = startY + row * gapY;
 
                 Enemy enemy = new Enemy(enemyX,enemyY);
 
@@ -207,9 +207,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
             Rectangle bulletBounds = bullet.getBounds();
 
-            for(int j = enemies.size(); j>=0; --j){
+            for(int j = enemies.size() - 1; j>=0; --j){
 
-                Enemy enemy = enemies.get(i);
+                Enemy enemy = enemies.get(j);
 
                 Rectangle enemyBounds = enemy.getBounds();
 
@@ -287,7 +287,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         g.setFont(new Font("Arial",Font.BOLD,18));
 
         g.drawString("Level: 1",20,30);
-        g.drawString("Score: 0",140,30);
+        g.drawString("Score: " + score,140,30);
         g.drawString("Lives: 3",270,30);
         g.drawString("Press SPACE to shoot", 410, 30);
 
