@@ -354,7 +354,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         lastEggTime= currentTime;
     }
 
-    public void updatePowerUps(){
+    private void updatePowerUps(){
 
         for(int i = powerUps.size() - 1; i>=0; --i){
 
@@ -368,7 +368,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
-    public void spawnPowerUp(int x, int y){
+    private void spawnPowerUp(int x, int y){
 
         int chance = random.nextInt(100);
 
@@ -453,11 +453,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
-    public void checkPowerUpPlaneCollision(){
+    private void checkPowerUpPlaneCollision(){
 
         Rectangle planeBounds = new Rectangle(planeX, planeY, planeWidth, planeHeight);
 
-        for(int i = powerUps.size(); i >= 0; --i){
+        for(int i = powerUps.size() - 1; i >= 0; --i){
 
             PowerUp powerUp = powerUps.get(i);
 
@@ -472,19 +472,22 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
-    public void applyPowerUp(PowerUp powerUp){
+    private void applyPowerUp(PowerUp powerUp){
 
         String type = powerUp.getType();
 
-        if(type.equals(powerUp.EXTRA_LIFE)){
+        if(type.equals(PowerUp.EXTRA_LIFE)){
 
             if(lives < 5){
                 lives++;
             }
         }
 
-        else if(fireLevel < maxFireLevel) {
-            fireLevel++;
+        else if(type.equals(PowerUp.ADD_FIRE)){
+
+            if(fireLevel < maxFireLevel){
+                fireLevel++;
+            }
         }
     }
 
