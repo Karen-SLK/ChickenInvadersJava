@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import javax.swing.*;
+import java.util.Random;
 
 
 public class GamePanel extends JPanel implements KeyListener, ActionListener {
@@ -31,6 +32,18 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private ArrayList<Bullet> bullets;
 
     private ArrayList<Enemy> enemies;
+
+    private ArrayList<Egg> eggs;
+
+    private Random random;
+
+    private long lastEggTime;
+
+    private int eggDelay = 1500;
+
+    private int lives = 3;
+
+    private boolean gameOver;
 
     private long lastShotTime;
 
@@ -59,6 +72,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         bullets = new ArrayList<>();
 
         enemies = new ArrayList<>();
+
+        eggs = new ArrayList<>();
+
+        random = new Random();
     }
 
     public void startGame(){
@@ -75,13 +92,21 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         enemies.clear();
 
+        eggs.clear();
+
         score = 0;
+
+        lives = 3;
+
+        gameOver = false;
 
         enemyDirection = 1;
 
         createEnemies();
 
         lastShotTime = 0;
+
+        lastEggTime = System.currentTimeMillis();
 
         requestFocusInWindow();
 
@@ -126,11 +151,21 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     public void updateGame(){
 
+        if(gameOver){
+            return;
+        }
+
         updatePlane();
         updateBullets();
         updateEnemies();
 
+        updateEnemyEggDropping();
+
+        updateEggs();
+
         checkBulletEnemyCollision();
+
+        checkEggPlaneCollision();
 
     }
 
@@ -199,6 +234,48 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
+    private void updateEggs(){
+
+        for(int i = eggs.size() - 1; i>=0; i--){
+
+            Egg egg = eggs.get(i);
+
+            egg.update();
+
+            if(egg.isOutOfScreen(getHeight())){
+                eggs.remove(i);
+            }
+        }
+    }
+
+    private void updateEnemyEggDropping(){
+
+        if(enemies.size() == 0){
+            return;
+        }
+
+        long currentTime = System.currentTimeMillis();
+
+        if(currentTime - lastEggTime < eggDelay){
+            return;
+        }
+
+        int enemyIndex = random.nextInt(enemies.size());
+
+        Enemy enemy = enemies.get(enemyIndex);
+
+        Rectangle enemyBounds = enemy.getBounds();
+
+        int eggX = enemyBounds.x + enemyBounds.width / 2 -5;
+        int eggY = enemyBounds.y + enemyBounds.height;
+
+        Egg egg = new Egg(eggX, eggY);
+
+        eggs.add(egg);
+
+        lastEggTime= currentTime;
+    }
+
     private void checkBulletEnemyCollision(){
 
         for(int i = bullets.size() - 1; i>=0; --i){
@@ -232,6 +309,29 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
+    private void checkEggPlaneCollision(){
+
+        Rectangle planeBounds = new Rectangle(planeX, planeY, planeWidth, planeHeight);
+
+        for(int i = eggs.size() -1; i>=0; --i){
+
+            Egg egg = eggs.get(i);
+
+            Rectangle eggBounds = egg.getBounds();
+
+            if(eggBounds.intersects(planeBounds)){
+
+                eggs.remove(i);
+
+                lives--;
+
+                if(lives <= 0){
+                    gameOver = true;
+                    gameTimer.stop();
+                }
+            }
+        }
+    }
 
     private void shootBullet(){
 
@@ -277,8 +377,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         drawHud(g);
         drawEnemies(g);
+        drawEggs(g);
         drawBullets(g);
         drawPlane(g);
+
+        if(gameOver){
+            drawGameOver(g);
+        }
     }
 
     private void drawHud(Graphics g){
@@ -288,7 +393,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         g.drawString("Level: 1",20,30);
         g.drawString("Score: " + score,140,30);
-        g.drawString("Lives: 3",270,30);
+        g.drawString("Lives: " + lives,270,30);
         g.drawString("Press SPACE to shoot", 410, 30);
 
         g.drawString("ESC: menu",620,30);
@@ -321,6 +426,29 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         int[] yPoints ={planeY,planeY + planeHeight,planeY + planeHeight};
 
         g.fillPolygon(xPoints,yPoints,3);
+    }
+
+    private void drawEggs(Graphics g){
+
+        for(int i = 0; i < eggs.size(); ++i){
+
+            Egg egg = eggs.get(i);
+
+            egg.draw(g);
+        }
+    }
+
+    private void drawGameOver(Graphics g){
+
+        g.setColor(Color.RED);
+
+        g.setFont(new Font("Arial", Font.BOLD, 50));
+
+        g.drawString("GAME OVER", 250, 280);
+
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+
+        g.drawString("Press ESC to return menu", 280, 320);
     }
 
     @Override
