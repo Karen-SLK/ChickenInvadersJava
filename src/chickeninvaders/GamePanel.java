@@ -35,6 +35,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private ArrayList<Egg> eggs;
 
+    private ArrayList<PowerUp> powerUps;
+
     private Random random;
 
     private long lastEggTime;
@@ -62,6 +64,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private boolean win;
 
+    private int fireLevel = 1;
+    private int maxFireLevel = 5;
+
     public GamePanel(GameMain gameMain){
 
         this.gameMain = gameMain;
@@ -79,6 +84,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         enemies = new ArrayList<>();
 
         eggs = new ArrayList<>();
+
+        powerUps = new ArrayList<>();
 
         random = new Random();
     }
@@ -99,6 +106,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         eggs.clear();
 
+        powerUps.clear();
+
         score = 0;
 
         level = 1;
@@ -106,6 +115,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         win = false;
 
         lives = 3;
+
+        fireLevel = 1;
 
         gameOver = false;
 
@@ -195,9 +206,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         updateEggs();
 
+        updatePowerUps();
+
         checkBulletEnemyCollision();
 
         checkEggPlaneCollision();
+
+        checkPowerUpPlaneCollision();
 
         checkLevelFinished();
 
@@ -339,6 +354,44 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         lastEggTime= currentTime;
     }
 
+    public void updatePowerUps(){
+
+        for(int i = powerUps.size() - 1; i>=0; --i){
+
+            PowerUp powerUp =   powerUps.get(i);
+
+            powerUp.update();
+
+            if(powerUp.isOutOfScreen(getHeight())){
+                powerUps.remove(i);
+            }
+        }
+    }
+
+    public void spawnPowerUp(int x, int y){
+
+        int chance = random.nextInt(100);
+
+        if(chance >= 20){
+            return;
+        }
+
+        String type;
+
+        int rnadomType = random.nextInt(2);
+
+        if(rnadomType == 0){
+            type = PowerUp.EXTRA_LIFE;
+        }
+        else{
+            type = PowerUp.ADD_FIRE;
+        }
+
+        PowerUp powerUp = new PowerUp(x, y, type);
+
+        powerUps.add(powerUp);
+    }
+
     private void checkBulletEnemyCollision(){
 
         for(int i = bullets.size() - 1; i>=0; --i){
@@ -362,6 +415,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                     if(enemyDead){
 
                         score += enemy.getScoreValue();
+
+                        Rectangle enemyBoundsForPowerUp = enemy.getBounds();
+
+                        spawnPowerUp(enemyBoundsForPowerUp.x, enemyBoundsForPowerUp.y);
 
                         enemies.remove(j);
                     }
@@ -396,6 +453,41 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
+    public void checkPowerUpPlaneCollision(){
+
+        Rectangle planeBounds = new Rectangle(planeX, planeY, planeWidth, planeHeight);
+
+        for(int i = powerUps.size(); i >= 0; --i){
+
+            PowerUp powerUp = powerUps.get(i);
+
+            Rectangle powerUpBounds = powerUp.getBounds();
+
+            if(powerUpBounds.intersects(planeBounds)){
+
+                applyPowerUp(powerUp);
+
+                powerUps.remove(i);
+            }
+        }
+    }
+
+    public void applyPowerUp(PowerUp powerUp){
+
+        String type = powerUp.getType();
+
+        if(type.equals(powerUp.EXTRA_LIFE)){
+
+            if(lives < 5){
+                lives++;
+            }
+        }
+
+        else if(fireLevel < maxFireLevel) {
+            fireLevel++;
+        }
+    }
+
     private void shootBullet(){
 
         long currentTime = System.currentTimeMillis();
@@ -404,12 +496,20 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             return;
         }
 
-        int bulletX = planeX + planeWidth / 2 - 3;
         int bulletY = planeY;
 
-        Bullet bullet = new Bullet(bulletX, bulletY);
+        int spacing = 12;
 
-        bullets.add(bullet);
+        int startX = planeX + planeWidth / 2 - ((fireLevel - 1) * spacing) / 2;
+
+        for(int i = 0; i < fireLevel; i++){
+
+            int bulletX = startX + i * spacing - 3;
+
+            Bullet bullet = new Bullet(bulletX, bulletY);
+
+            bullets.add(bullet);
+        }
 
         lastShotTime = currentTime;
     }
@@ -441,6 +541,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         drawHud(g);
         drawEnemies(g);
         drawEggs(g);
+        drawPowerUps(g);
         drawBullets(g);
         drawPlane(g);
 
@@ -459,11 +560,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         g.setFont(new Font("Arial",Font.BOLD,18));
 
         g.drawString("Level: " + level,20,30);
-        g.drawString("Score: " + score,140,30);
-        g.drawString("Lives: " + lives,270,30);
-        g.drawString("Press SPACE to shoot", 410, 30);
-
-        g.drawString("ESC: menu",620,30);
+        g.drawString("Score: " + score,130,30);
+        g.drawString("Lives: " + lives,250,30);
+        g.drawString("Fire: " + fireLevel,360,30);
+        g.drawString("SPACE: shoot",470,30);
+        g.drawString("ESC: menu",630,30);
     }
 
     private void drawEnemies(Graphics g){
@@ -529,6 +630,16 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         g.setFont(new Font("Arial", Font.BOLD, 20));
 
         g.drawString("Press ESC to return menu", 280, 320);
+    }
+
+    public void drawPowerUps(Graphics g){
+
+        for(int i = 0; i < powerUps.size(); ++i){
+
+            PowerUp powerUp = powerUps.get(i);
+
+            powerUp.draw(g);
+        }
     }
 
     @Override

@@ -1,0 +1,68 @@
+package chickeninvaders;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.util.PrimitiveIterator;
+
+public class PowerUp {
+
+    public static final String EXTRA_LIFE = "EXTRA_LIFE";
+    public static final String ADD_FIRE = "ADD_FIRE";
+
+    private int x;
+    private int y;
+
+    private int width = 25;
+    private int height = 25;
+
+    private int speed = 2;
+
+    private String type;
+
+    public PowerUp(int x, int y, String type){
+
+        this.x = x;
+        this.y = y;
+        this.type = type;
+    }
+
+    public void update(){
+        y += speed;
+    }
+
+    public void draw(Graphics g){
+
+        if(type.equals(EXTRA_LIFE)){
+            g.setColor(Color.PINK);
+        }
+        else if(type.equals(ADD_FIRE)) {
+            g.setColor(Color.MAGENTA);
+        }
+
+        g.fillOval(x, y, width, height);
+
+        g.setColor(Color.WHITE);
+
+        if (type.equals(EXTRA_LIFE)) {
+
+            g.drawString("+", x + 8, y + 18);
+        }
+        else if (type.equals(ADD_FIRE)) {
+
+            g.drawString("F", x + 8, y + 18);
+        }
+    }
+
+    public boolean isOutOfScreen(int panelHeight){
+        return y > panelHeight;
+    }
+
+    public Rectangle getBounds(){
+        return new Rectangle(x, y, width, height);
+    }
+
+    public String getType(){
+        return type;
+    }
+}
