@@ -57,6 +57,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private int score;
 
+    private int level = 1;
+    private int maxLevel = 3;
+
+    private boolean win;
+
     public GamePanel(GameMain gameMain){
 
         this.gameMain = gameMain;
@@ -96,11 +101,17 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         score = 0;
 
+        level = 1;
+
+        win = false;
+
         lives = 3;
 
         gameOver = false;
 
         enemyDirection = 1;
+
+        setupLevel();
 
         createEnemies();
 
@@ -111,6 +122,27 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         requestFocusInWindow();
 
         gameTimer.start();
+    }
+
+    private void setupLevel(){
+
+        if(level == 1){
+            enemySpeed = 1;
+            enemyDownStep = 20;
+            eggDelay = 3000;
+        }
+
+        else if(level == 2) {
+            enemySpeed = 2;
+            enemyDownStep = 20;
+            eggDelay = 2000;
+        }
+
+        else if(level == 3) {
+            enemySpeed = 2;
+            enemyDownStep = 25;
+            eggDelay = 1500;
+        }
     }
 
     public void stopGame(){
@@ -151,7 +183,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     public void updateGame(){
 
-        if(gameOver){
+        if(gameOver || win){
             return;
         }
 
@@ -167,9 +199,40 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         checkEggPlaneCollision();
 
+        checkLevelFinished();
+
     }
 
+    private void checkLevelFinished(){
 
+        if(enemies.size() > 0){
+            return;
+        }
+
+        score += 200;
+        level++;
+
+        if(level > maxLevel){
+
+            win = true;
+
+            gameTimer.stop();
+
+            return;
+        }
+
+        bullets.clear();
+
+        eggs.clear();
+
+        enemyDirection = 1;
+
+        setupLevel();
+
+        createEnemies();
+
+        lastEggTime = System.currentTimeMillis();
+    }
 
     private void updatePlane(){
 
@@ -384,6 +447,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         if(gameOver){
             drawGameOver(g);
         }
+
+        if(win){
+            drawWin(g);
+        }
     }
 
     private void drawHud(Graphics g){
@@ -391,7 +458,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial",Font.BOLD,18));
 
-        g.drawString("Level: 1",20,30);
+        g.drawString("Level: " + level,20,30);
         g.drawString("Score: " + score,140,30);
         g.drawString("Lives: " + lives,270,30);
         g.drawString("Press SPACE to shoot", 410, 30);
@@ -445,6 +512,19 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         g.setFont(new Font("Arial", Font.BOLD, 50));
 
         g.drawString("GAME OVER", 250, 280);
+
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+
+        g.drawString("Press ESC to return menu", 280, 320);
+    }
+
+    private void drawWin(Graphics g){
+
+        g.setColor(Color.GREEN);
+
+        g.setFont(new Font("Arial", Font.BOLD, 50));
+
+        g.drawString("YOU WIN!", 270, 280);
 
         g.setFont(new Font("Arial", Font.BOLD, 20));
 
