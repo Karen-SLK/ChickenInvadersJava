@@ -37,6 +37,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private ArrayList<PowerUp> powerUps;
 
+    private ArrayList<Explosion> explosions;
+
     private Random random;
 
     private long lastEggTime;
@@ -87,6 +89,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         powerUps = new ArrayList<>();
 
+        explosions = new ArrayList<>();
+
         random = new Random();
     }
 
@@ -107,6 +111,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         eggs.clear();
 
         powerUps.clear();
+
+        explosions.clear();
 
         score = 0;
 
@@ -207,6 +213,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         updateEggs();
 
         updatePowerUps();
+
+        updateExplosions();
 
         checkBulletEnemyCollision();
 
@@ -368,6 +376,20 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
+    private void updateExplosions(){
+
+        for(int i = explosions.size() - 1; i >= 0; --i){
+
+            Explosion explosion = explosions.get(i);
+
+            explosion.update();
+
+            if(explosion.isFinished()){
+                explosions.remove(i);
+            }
+        }
+    }
+
     private void spawnPowerUp(int x, int y){
 
         int chance = random.nextInt(100);
@@ -378,9 +400,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         String type;
 
-        int rnadomType = random.nextInt(2);
+        int randomType = random.nextInt(2);
 
-        if(rnadomType == 0){
+        if(randomType == 0){
             type = PowerUp.EXTRA_LIFE;
         }
         else{
@@ -418,6 +440,14 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                         Rectangle enemyBoundsForPowerUp = enemy.getBounds();
 
+                        int explosionX = enemyBoundsForPowerUp.x + enemyBoundsForPowerUp.width / 2;
+
+                        int explosionY = enemyBoundsForPowerUp.y + enemyBoundsForPowerUp.height / 2;
+
+                        Explosion explosion = new Explosion(explosionX, explosionY);
+
+                        explosions.add(explosion);
+
                         spawnPowerUp(enemyBoundsForPowerUp.x, enemyBoundsForPowerUp.y);
 
                         enemies.remove(j);
@@ -442,6 +472,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             if(eggBounds.intersects(planeBounds)){
 
                 eggs.remove(i);
+
+                int explosionX = planeX + planeWidth / 2;
+                int explosionY = planeY + planeHeight / 2;
+
+                Explosion explosion = new Explosion(explosionX, explosionY);
+
+                explosions.add(explosion);
 
                 lives--;
 
@@ -545,6 +582,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         drawEnemies(g);
         drawEggs(g);
         drawPowerUps(g);
+        drawExplosions(g);
         drawBullets(g);
         drawPlane(g);
 
@@ -635,13 +673,23 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         g.drawString("Press ESC to return menu", 280, 320);
     }
 
-    public void drawPowerUps(Graphics g){
+    private void drawPowerUps(Graphics g){
 
         for(int i = 0; i < powerUps.size(); ++i){
 
             PowerUp powerUp = powerUps.get(i);
 
             powerUp.draw(g);
+        }
+    }
+
+    private void drawExplosions(Graphics g){
+
+        for(int i = 0; i < explosions.size(); i++){
+
+            Explosion explosion = explosions.get(i);
+
+            explosion.draw(g);
         }
     }
 
