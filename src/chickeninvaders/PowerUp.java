@@ -9,6 +9,10 @@ public class PowerUp {
     public static final String EXTRA_LIFE = "EXTRA_LIFE";
     public static final String ADD_FIRE = "ADD_FIRE";
 
+    public static final String RAPID_FIRE = "RAPID_FIRE";
+    public static final String  SHIELD = "SHIELD";
+    public static final String FREEZE_BOMB = "FREEZE_BOMB";
+
     private int x;
     private int y;
 
@@ -38,6 +42,15 @@ public class PowerUp {
         else if(type.equals(ADD_FIRE)) {
             g.setColor(Color.MAGENTA);
         }
+        else if(type.equals(RAPID_FIRE)){
+            g.setColor(Color.YELLOW);
+        }
+        else if(type.equals(SHIELD)) {
+            g.setColor(Color.CYAN);
+        }
+        else if(type.equals(FREEZE_BOMB)){
+            g.setColor(Color.BLUE);
+        }
 
         g.fillOval(x, y, width, height);
 
@@ -50,6 +63,15 @@ public class PowerUp {
         else if (type.equals(ADD_FIRE)) {
 
             g.drawString("F", x + 8, y + 18);
+        }
+        else if (type.equals(RAPID_FIRE)) {
+            g.drawString("R", x + 8, y + 18);
+        }
+        else if (type.equals(SHIELD)) {
+            g.drawString("S", x + 8, y + 18);
+        }
+        else if (type.equals(FREEZE_BOMB)) {
+            g.drawString("Z", x + 8, y + 18);
         }
     }
 

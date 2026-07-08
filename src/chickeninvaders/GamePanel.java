@@ -61,6 +61,20 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private int score;
 
+    private boolean rapidFireActive;
+
+    private long rapidFireEndTime;
+
+    private boolean shieldActive;
+
+    private long shieldEndTime;
+
+    private boolean freezeActive;
+
+    private long freezeEndTime;
+
+    private int rapidShotDelay = 100;
+
     private int level = 1;
     private int maxLevel = 3;
 
@@ -123,6 +137,18 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         lives = 3;
 
         fireLevel = 1;
+
+        rapidFireActive = false;
+
+        shieldActive = false;
+
+        freezeActive = false;
+
+        rapidFireEndTime = 0;
+
+        shieldEndTime = 0;
+
+        freezeEndTime = 0;
 
         gameOver = false;
 
@@ -204,13 +230,19 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             return;
         }
 
+        updateTemporaryPowerUps();
+
         updatePlane();
         updateBullets();
-        updateEnemies();
 
-        updateEnemyEggDropping();
+       if(!freezeActive){
 
-        updateEggs();
+           updateEnemies();
+
+           updateEnemyEggDropping();
+
+           updateEggs();
+       }
 
         updatePowerUps();
 
@@ -390,6 +422,26 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
+    private void updateTemporaryPowerUps(){
+
+        long currentTime = System.currentTimeMillis();
+
+        if(rapidFireActive && currentTime >= rapidFireEndTime){
+
+            rapidFireActive = false;
+        }
+
+        if(shieldActive && currentTime >= shieldEndTime){
+
+            shieldActive = false;
+        }
+
+        if(freezeActive && currentTime >= freezeEndTime){
+
+            freezeActive = false;
+        }
+    }
+
     private void spawnPowerUp(int x, int y){
 
         int chance = random.nextInt(100);
@@ -400,13 +452,22 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         String type;
 
-        int randomType = random.nextInt(2);
+        int randomType = random.nextInt(5);
 
         if(randomType == 0){
             type = PowerUp.EXTRA_LIFE;
         }
-        else{
+        else if(randomType == 1){
             type = PowerUp.ADD_FIRE;
+        }
+        else if(randomType == 2){
+            type = PowerUp.RAPID_FIRE;
+        }
+        else if(randomType == 3){
+            type = PowerUp.SHIELD;
+        }
+        else{
+            type = PowerUp.FREEZE_BOMB;
         }
 
         PowerUp powerUp = new PowerUp(x, y, type);
@@ -480,11 +541,14 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                 explosions.add(explosion);
 
-                lives--;
+                if(!shieldActive){
 
-                if(lives <= 0){
-                    gameOver = true;
-                    gameTimer.stop();
+                    lives--;
+
+                    if (lives <= 0) {
+                        gameOver = true;
+                        gameTimer.stop();
+                    }
                 }
             }
         }
@@ -513,6 +577,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         String type = powerUp.getType();
 
+        long currentTime = System.currentTimeMillis();
+
         if(type.equals(PowerUp.EXTRA_LIFE)){
 
             if(lives < 5){
@@ -526,13 +592,40 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                 fireLevel++;
             }
         }
+
+        else if(type.equals(PowerUp.RAPID_FIRE)){
+
+            rapidFireActive = true;
+
+            rapidFireEndTime = currentTime + 8000;
+        }
+
+        else if(type.equals(PowerUp.SHIELD)){
+
+            shieldActive = true;
+
+            shieldEndTime = currentTime + 10000;
+        }
+
+        else if(type.equals(PowerUp.FREEZE_BOMB)){
+
+            freezeActive = true;
+
+            freezeEndTime = currentTime + 3000;
+        }
     }
 
     private void shootBullet(){
 
         long currentTime = System.currentTimeMillis();
 
-        if(currentTime - lastShotTime < shotDelay){
+        int currentShotDelay = shotDelay;
+
+        if(rapidFireActive){
+            currentShotDelay = rapidShotDelay;
+        }
+
+        if(currentTime - lastShotTime < currentShotDelay){
             return;
         }
 
@@ -585,6 +678,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         drawExplosions(g);
         drawBullets(g);
         drawPlane(g);
+        drawShield(g);
 
         if(gameOver){
             drawGameOver(g);
@@ -606,6 +700,22 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         g.drawString("Fire: " + fireLevel,360,30);
         g.drawString("SPACE: shoot",470,30);
         g.drawString("ESC: menu",630,30);
+
+        String status = "";
+
+        if(rapidFireActive){
+            status += "Rapid ";
+        }
+
+        if(shieldActive){
+            status += "Shield ";
+        }
+
+        if(freezeActive){
+            status += "Freeze ";
+        }
+
+        g.drawString(status, 20, 55);
     }
 
     private void drawEnemies(Graphics g){
@@ -692,6 +802,18 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             explosion.draw(g);
         }
     }
+
+    private void drawShield(Graphics g){
+
+        if(!shieldActive){
+            return;
+        }
+
+        g.setColor(Color.CYAN);
+
+        g.drawOval(planeX - 8, planeY - 8, planeWidth + 16, planeHeight + 16);
+    }
+
 
     @Override
     public void keyPressed(KeyEvent e){
