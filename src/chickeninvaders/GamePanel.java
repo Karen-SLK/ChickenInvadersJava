@@ -210,11 +210,43 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                 int enemyX = startX + col * gapX;
                 int enemyY = startY + row * gapY;
 
-                Enemy enemy = new Enemy(enemyX,enemyY);
+                String enemyType = chooseEnemyType(row, col);
+
+                Enemy enemy = new Enemy(enemyX,enemyY,enemyType,level);
 
                 enemies.add(enemy);
             }
         }
+    }
+
+    private String chooseEnemyType(int row, int col) {
+
+        if (level == 1) {
+
+            return Enemy.NORMAL;
+        }
+
+        if (level == 2) {
+
+            if (col % 2 == 0) {
+                return Enemy.NORMAL;
+            }
+            else {
+                return Enemy.FAST;
+            }
+        }
+
+        if (level == 3) {
+
+            if (row % 2 == 0) {
+                return Enemy.NORMAL;
+            }
+            else {
+                return Enemy.ZIGZAG;
+            }
+        }
+
+        return Enemy.NORMAL;
     }
 
     @Override
@@ -837,8 +869,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             shootBullet();
         }
 
-        if(key == KeyEvent.VK_ESCAPE){
-            gameMain.showMainMenu();
+        if(key == KeyEvent.VK_SPACE && !gameOver && !win){
+            shootBullet();
         }
     }
 
