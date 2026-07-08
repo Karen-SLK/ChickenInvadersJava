@@ -39,6 +39,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private ArrayList<Explosion> explosions;
 
+    private ArrayList<EnemyBullet> enemyBullets;
+
     private Random random;
 
     private long lastEggTime;
@@ -75,6 +77,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private int rapidShotDelay = 100;
 
+    private long lastShooterShotTime;
+
+    private int shooterShotDelay = 2000;
+
     private int level = 1;
     private int maxLevel = 3;
 
@@ -105,6 +111,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         explosions = new ArrayList<>();
 
+        enemyBullets = new ArrayList<>();
+
         random = new Random();
     }
 
@@ -127,6 +135,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         powerUps.clear();
 
         explosions.clear();
+
+        enemyBullets.clear();
 
         score = 0;
 
@@ -161,6 +171,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         lastShotTime = 0;
 
         lastEggTime = System.currentTimeMillis();
+
+        lastShooterShotTime = System.currentTimeMillis();
 
         requestFocusInWindow();
 
@@ -238,7 +250,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         if (level == 3) {
 
-            if (row % 2 == 0) {
+            if (col % 4 == 0) {
+                return Enemy.SHOOTER;
+            }
+            else if (row % 2 == 0) {
                 return Enemy.NORMAL;
             }
             else {
@@ -273,7 +288,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
            updateEnemyEggDropping();
 
+           updateShooterAttacks();
+
            updateEggs();
+
+           updateEnemyBullets();
        }
 
         updatePowerUps();
@@ -283,6 +302,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         checkBulletEnemyCollision();
 
         checkEggPlaneCollision();
+
+        checkEnemyBulletPlaneCollision();
 
         checkPowerUpPlaneCollision();
 
@@ -342,6 +363,59 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         keepPlaneInsideWindow();
     }
 
+    private void updateShooterAttacks(){
+
+        long currentTime = System.currentTimeMillis();
+
+        if(currentTime - lastShooterShotTime < shooterShotDelay){
+            return;
+        }
+
+        ArrayList<Enemy> shooters = new ArrayList<>();
+
+        for(int i = 0; i < enemies.size(); i++){
+
+            Enemy enemy = enemies.get(i);
+
+            if(enemy.getType().equals(Enemy.SHOOTER)){
+                shooters.add(enemy);
+            }
+        }
+
+        if(shooters.size() == 0){
+            return;
+        }
+
+        int shooterIndex = random.nextInt(shooters.size());
+
+        Enemy shooter = shooters.get(shooterIndex);
+
+        Rectangle shooterBounds = shooter.getBounds();
+
+        int shooterCenterX = shooterBounds.x + shooterBounds.width / 2;
+
+        int planeCenterX = planeX + planeWidth / 2;
+
+        int speedX = 0;
+
+        if(planeCenterX < shooterCenterX - 20) {
+            speedX = -3;
+        }
+        else if(planeCenterX > shooterCenterX + 20) {
+            speedX = 3;
+        }
+
+        int speedY = 4;
+
+        EnemyBullet enemyBullet = new EnemyBullet(
+                shooterCenterX - 5,
+                shooterBounds.y + shooterBounds.height,
+                speedX,
+                speedY
+        );
+
+    }
+
     private void updateBullets(){
 
         for(int i = bullets.size() - 1; i>=0; --i){
@@ -352,6 +426,20 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
             if(bullet.isOutOfScreen()){
                 bullets.remove(i);
+            }
+        }
+    }
+
+    private void updateEnemyBullets(){
+
+        for(int i = enemyBullets.size() - 1; i>=0; --i){
+
+            EnemyBullet enemyBullet = enemyBullets.get(i);
+
+            enemyBullet.update();
+
+            if(enemyBullet.isOutOfScreen(getWidth(), getHeight())){
+                enemyBullets.remove(i);
             }
         }
     }
@@ -586,6 +674,40 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
+    private void checkEnemyBulletPlaneCollision(){
+
+        Rectangle planeBounds = new Rectangle(planeX, planeY, planeWidth, planeHeight);
+
+        for(int i = enemyBullets.size() - 1; i>=0; i--){
+
+            EnemyBullet enemyBullet = enemyBullets.get(i);
+
+            Rectangle bulletBounds = enemyBullet.getBounds();
+
+            if(bulletBounds.intersects(planeBounds)){
+
+                enemyBullets.remove(i);
+
+                int explosionX = planeX + planeWidth / 2;
+                int explosionY = planeY + planeHeight / 2;
+
+                Explosion explosion = new Explosion(explosionX, explosionY);
+
+                explosions.add(explosion);
+
+                if(!shieldActive) {
+
+                    lives--;
+
+                    if (lives <= 0) {
+                        gameOver = true;
+                        gameTimer.stop();
+                    }
+                }
+            }
+        }
+    }
+
     private void checkPowerUpPlaneCollision(){
 
         Rectangle planeBounds = new Rectangle(planeX, planeY, planeWidth, planeHeight);
@@ -706,6 +828,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         drawHud(g);
         drawEnemies(g);
         drawEggs(g);
+        drawEnemyBullets(g);
         drawPowerUps(g);
         drawExplosions(g);
         drawBullets(g);
@@ -766,6 +889,16 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
             Bullet bullet = bullets.get(i);
             bullet.draw(g);
+        }
+    }
+
+    private void drawEnemyBullets(Graphics g){
+
+        for(int i = 0; i<enemyBullets.size(); ++i){
+
+            EnemyBullet enemyBullet = enemyBullets.get(i);
+
+            enemyBullet.draw(g);
         }
     }
 

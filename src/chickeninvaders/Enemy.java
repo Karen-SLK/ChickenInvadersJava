@@ -151,4 +151,12 @@ public class Enemy {
     public String getType(){
         return type;
     }
+
+    public int getY(){
+        return y;
+    }
+
+    public int getHeight(){
+        return height;
+    }
 }
