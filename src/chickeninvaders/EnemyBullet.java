@@ -9,8 +9,8 @@ public class EnemyBullet {
     private int x;
     private int y;
 
-    private int width;
-    private int height;
+    private int width =10;
+    private int height =10;
 
     private int speedX;
     private int speedY;

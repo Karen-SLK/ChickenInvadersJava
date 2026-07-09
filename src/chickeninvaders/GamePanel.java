@@ -414,6 +414,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                 speedY
         );
 
+        enemyBullets.add(enemyBullet);
+        lastShooterShotTime = currentTime;
     }
 
     private void updateBullets(){
@@ -997,13 +999,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         if(key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S){
             movingDown = true;
         }
-
-        if(key == KeyEvent.VK_SPACE){
-            shootBullet();
-        }
-
         if(key == KeyEvent.VK_SPACE && !gameOver && !win){
             shootBullet();
+        }
+        if(key == KeyEvent.VK_ESCAPE){
+            gameMain.showMainMenu();
         }
     }
 
