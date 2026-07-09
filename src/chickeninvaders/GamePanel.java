@@ -82,7 +82,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private int shooterShotDelay = 2000;
 
     private int level = 1;
-    private int maxLevel = 3;
+    private int maxLevel = 8;
 
     private boolean win;
 
@@ -185,18 +185,55 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             enemySpeed = 1;
             enemyDownStep = 20;
             eggDelay = 3000;
+            shooterShotDelay = 2500;
         }
 
         else if(level == 2) {
             enemySpeed = 2;
             enemyDownStep = 20;
-            eggDelay = 2000;
+            eggDelay = 2500;
+            shooterShotDelay = 2400;
         }
 
         else if(level == 3) {
             enemySpeed = 2;
             enemyDownStep = 25;
-            eggDelay = 1500;
+            eggDelay = 2200;
+            shooterShotDelay = 2200;
+        }
+
+        else if(level == 4){
+            enemySpeed = 2;
+            enemyDownStep = 25;
+            eggDelay = 2000;
+            shooterShotDelay = 2000;
+        }
+
+        else if(level == 5){
+            enemySpeed = 3;
+            enemyDownStep = 25;
+            eggDelay = 1800;
+            shooterShotDelay = 1800;
+        }
+
+        else if(level == 6){
+            enemySpeed = 3;
+            enemyDownStep = 30;
+            eggDelay = 1600;
+            shooterShotDelay = 1600;
+        }
+
+        else if(level == 7){
+            enemySpeed = 3;
+            enemyDownStep = 30;
+            eggDelay = 1400;
+            shooterShotDelay = 1400;
+        } else if (level == 8) {
+
+            enemySpeed = 4;
+            enemyDownStep = 30;
+            eggDelay = 1200;
+            shooterShotDelay = 1200;
         }
     }
 
@@ -250,13 +287,69 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         if (level == 3) {
 
-            if (col % 4 == 0) {
-                return Enemy.SHOOTER;
-            }
-            else if (row % 2 == 0) {
+            if(row % 2 == 0){
                 return Enemy.NORMAL;
             }
-            else {
+            else{
+                return Enemy.ZIGZAG;
+            }
+        }
+
+        if(level == 4){
+
+            if(col % 4 == 0){
+                return Enemy.SHOOTER;
+            }
+            else{
+                return Enemy.NORMAL;
+            }
+        }
+
+        if(level == 5){
+
+            if(col % 3 == 0){
+                return Enemy.SHOOTER;
+            }
+            else if(row % 2 == 0){
+                return Enemy.FAST;
+            }
+            else{
+                return Enemy.NORMAL;
+            }
+        }
+
+        if(level == 6){
+
+            if(col % 3 == 0){
+                return Enemy.SHOOTER;
+            }
+            else if(row % 2 == 0) {
+                return Enemy.ZIGZAG;
+            }
+            else{
+                return Enemy.FAST;
+            }
+        }
+
+        if(level == 7){
+
+            if(col % 2 == 0){
+                return Enemy.SHOOTER;
+            }
+            else if(row % 2 == 0){
+                return Enemy.ZIGZAG;
+            }
+            else{
+                return Enemy.FAST;
+            }
+        }
+
+        if(level == 8){
+
+            if(col % 2 ==0){
+                return Enemy.SHOOTER;
+            }
+            else{
                 return Enemy.ZIGZAG;
             }
         }
@@ -333,6 +426,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         eggs.clear();
 
+        enemyBullets.clear();
+
+        powerUps.clear();
+
         enemyDirection = 1;
 
         setupLevel();
@@ -340,6 +437,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         createEnemies();
 
         lastEggTime = System.currentTimeMillis();
+
+        lastShooterShotTime = System.currentTimeMillis();
     }
 
     private void updatePlane(){
