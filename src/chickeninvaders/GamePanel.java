@@ -63,6 +63,12 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private int score;
 
+    private Boss boss;
+
+    private long lastBossShotTime;
+
+    private int bossShotDelay = 1500;
+
     private boolean rapidFireActive;
 
     private long rapidFireEndTime;
@@ -138,6 +144,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         enemyBullets.clear();
 
+        boss = null;
+
         score = 0;
 
         level = 1;
@@ -166,13 +174,20 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         setupLevel();
 
-        createEnemies();
+        if(isBossLevel()){
+            createBoss();
+        }
+        else{
+            createEnemies();
+        }
 
         lastShotTime = 0;
 
         lastEggTime = System.currentTimeMillis();
 
         lastShooterShotTime = System.currentTimeMillis();
+
+        lastBossShotTime = System.currentTimeMillis();
 
         requestFocusInWindow();
 
@@ -242,6 +257,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         gameTimer.stop();
     }
 
+    public boolean isBossLevel(){
+        return level == 4 || level == 8;
+    }
+
     public void createEnemies(){
 
         int rows = 5;
@@ -266,6 +285,22 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                 enemies.add(enemy);
             }
         }
+    }
+
+    public void createBoss(){
+
+        enemies.clear();
+
+        boss = new Boss(getWidth(),level);
+
+        if(level == 4){
+            bossShotDelay = 1500;
+        }
+        else{
+            bossShotDelay = 1000;
+        }
+
+        lastBossShotTime = System.currentTimeMillis();
     }
 
     private String chooseEnemyType(int row, int col) {
@@ -377,11 +412,15 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
        if(!freezeActive){
 
-           updateEnemies();
-
-           updateEnemyEggDropping();
-
-           updateShooterAttacks();
+           if(boss != null){
+               updateBoss();
+               updateBossAttacks();
+           }
+           else{
+               updateEnemies();
+               updateEnemyEggDropping();
+               updateShooterAttacks();
+           }
 
            updateEggs();
 
@@ -406,8 +445,17 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private void checkLevelFinished(){
 
-        if(enemies.size() > 0){
-            return;
+        if(isBossLevel()){
+
+            if(boss != null){
+                return;
+            }
+        }
+        else{
+
+            if(enemies.size() > 0){
+                return;
+            }
         }
 
         score += 200;
@@ -430,15 +478,24 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         powerUps.clear();
 
+        boss = null;
+
         enemyDirection = 1;
 
         setupLevel();
 
-        createEnemies();
+        if(isBossLevel()){
+            createBoss();
+        }
+        else{
+            createEnemies();
+        }
 
         lastEggTime = System.currentTimeMillis();
 
         lastShooterShotTime = System.currentTimeMillis();
+
+        lastBossShotTime = System.currentTimeMillis();
     }
 
     private void updatePlane(){
@@ -663,6 +720,52 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
+    private void updateBoss(){
+        if(boss != null){
+            boss.update(getWidth());
+        }
+    }
+
+    private void updateBossAttacks(){
+
+        if(boss == null){
+            return;
+        }
+
+        long currentTime = System.currentTimeMillis();
+
+        if(currentTime - lastBossShotTime < bossShotDelay){
+            return;
+        }
+
+        Rectangle bossBounds = boss.getBounds();
+
+        int bossCenterX = bossBounds.x + bossBounds.width / 2;
+        int planeCenterX = planeX + planeWidth / 2;
+
+        int speedX = 0;
+
+        if(planeCenterX < bossCenterX - 20){
+            speedX = -3;
+        }
+        else if(planeCenterX > bossCenterX + 20){
+            speedX = 3;
+        }
+
+        int speedY = 5;
+
+        EnemyBullet bullet = new EnemyBullet(
+                bossCenterX - 5,
+                bossBounds.y + bossBounds.height,
+                speedX,
+                speedY
+        );
+
+        enemyBullets.add(bullet);
+
+        lastBossShotTime = currentTime;
+    }
+
     private void spawnPowerUp(int x, int y){
 
         int chance = random.nextInt(100);
@@ -703,6 +806,31 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             Bullet bullet = bullets.get(i);
 
             Rectangle bulletBounds = bullet.getBounds();
+
+            if(boss != null && bulletBounds.intersects(boss.getBounds())){
+
+                bullets.remove(i);
+
+                boolean bossDead = boss.hit();
+
+                if(bossDead){
+
+                    Rectangle bossBounds = boss.getBounds();
+
+                    int explosionX = bossBounds.x + bossBounds.width / 2;
+                    int explosionY = bossBounds.y + bossBounds.height / 2;
+
+                    Explosion explosion = new Explosion(explosionX, explosionY);
+
+                    explosions.add(explosion);
+
+                    score += boss.getScoreValue();
+
+                    boss = null;
+                }
+
+                continue;
+            }
 
             for(int j = enemies.size() - 1; j>=0; --j){
 
@@ -928,6 +1056,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         drawHud(g);
         drawEnemies(g);
+        drawBoss(g);
         drawEggs(g);
         drawEnemyBullets(g);
         drawPowerUps(g);
@@ -1020,6 +1149,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             Egg egg = eggs.get(i);
 
             egg.draw(g);
+        }
+    }
+
+    private void drawBoss(Graphics g){
+
+        if(boss != null){
+            boss.draw(g);
         }
     }
 
