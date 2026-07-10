@@ -164,12 +164,51 @@ public class MainMenu extends JPanel{
 
     private void showSettings(){
 
-        String text = "";
+        JCheckBox backgroundMusicCheckBox = new JCheckBox(
+                "Background Music",
+                SoundSettings.isBackgroundMusicOn()
+        );
 
-        text += "Settings\n\n";
-        text += "Current version uses default game settings.\n";
-        text += "Sound and difficulty settings can be added later.";
+        JCheckBox shotSoundCheckBox = new JCheckBox(
+                "Shot Sound",
+                SoundSettings.isShotSoundOn()
+        );
 
-        JOptionPane.showMessageDialog(this, text, "Settings", JOptionPane.INFORMATION_MESSAGE);
+        JCheckBox explosionSoundCheckBox = new JCheckBox(
+                "Crash / Explosion Sound",
+                SoundSettings.isExplosionSoundOn()
+        );
+
+        JCheckBox gameResultSoundCheckBox = new JCheckBox(
+                "Game Over / Win Sound",
+                SoundSettings.isGameResultSoundOn()
+        );
+
+        JPanel panel = new JPanel();
+
+        panel.setLayout(new GridLayout(4, 1));
+
+        panel.add(backgroundMusicCheckBox);
+        panel.add(shotSoundCheckBox);
+        panel.add(explosionSoundCheckBox);
+        panel.add(gameResultSoundCheckBox);
+
+        int result = JOptionPane.showConfirmDialog(
+                this,
+                panel,
+                "Sound Settings",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        );
+
+        if(result == JOptionPane.OK_OPTION){
+
+            SoundSettings.setBackgroundMusicOn(backgroundMusicCheckBox.isSelected());
+            SoundSettings.setShotSoundOn(shotSoundCheckBox.isSelected());
+            SoundSettings.setExplosionSoundOn(explosionSoundCheckBox.isSelected());
+            SoundSettings.setGameResultSoundOn(gameResultSoundCheckBox.isSelected());
+
+            JOptionPane.showMessageDialog(this, "Sound settings saved.");
+        }
     }
 }
