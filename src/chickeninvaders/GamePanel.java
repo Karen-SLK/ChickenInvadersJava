@@ -97,6 +97,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private boolean scoreSaved;
 
+    private boolean paused;
+
     public GamePanel(GameMain gameMain){
 
         this.gameMain = gameMain;
@@ -171,6 +173,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         freezeEndTime = 0;
 
         gameOver = false;
+
+        paused = false;
 
         scoreSaved = false;
 
@@ -406,6 +410,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     public void updateGame(){
 
         if(gameOver || win){
+            return;
+        }
+
+        if(paused){
             return;
         }
 
@@ -1098,6 +1106,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         if(win){
             drawWin(g);
         }
+
+        if(paused){
+            drawPaused(g);
+        }
     }
 
     private void drawHud(Graphics g){
@@ -1110,7 +1122,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         g.drawString("Lives: " + lives,250,30);
         g.drawString("Fire: " + fireLevel,360,30);
         g.drawString("SPACE: shoot",470,30);
-        g.drawString("ESC: menu",630,30);
+        g.drawString("P: pause",630,30);
+        g.drawString("ESC: menu",630,55);
 
         String status = "";
 
@@ -1221,6 +1234,19 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
+    private void drawPaused(Graphics g){
+
+        g.setColor(Color.YELLOW);
+
+        g.setFont(new Font("Arial",Font.BOLD,50));
+
+        g.drawString("PAUSED",300,280);
+
+        g.setFont(new Font("Arial",Font.BOLD,20));
+
+        g.drawString("Press P to resume",310,320);
+    }
+
     private void drawExplosions(Graphics g){
 
         for(int i = 0; i < explosions.size(); i++){
@@ -1248,6 +1274,16 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         int key = e.getKeyCode();
 
+        if(key == KeyEvent.VK_P && !gameOver && !win){
+            paused = !paused;
+            repaint();
+            return;
+        }
+
+        if(paused){
+            return;
+        }
+
         if(key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A){
             movingLeft = true;
         }
@@ -1260,7 +1296,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         if(key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S){
             movingDown = true;
         }
-        if(key == KeyEvent.VK_SPACE && !gameOver && !win){
+        if(key == KeyEvent.VK_SPACE && !gameOver && !win && !paused){
             shootBullet();
         }
         if(key == KeyEvent.VK_ESCAPE){
