@@ -95,6 +95,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private int fireLevel = 1;
     private int maxFireLevel = 5;
 
+    private boolean scoreSaved;
+
     public GamePanel(GameMain gameMain){
 
         this.gameMain = gameMain;
@@ -169,6 +171,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         freezeEndTime = 0;
 
         gameOver = false;
+
+        scoreSaved = false;
 
         enemyDirection = 1;
 
@@ -443,6 +447,24 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     }
 
+    private void saveFinalScore(){
+
+        if(scoreSaved){
+            return;
+        }
+
+        String playerName = JOptionPane.showInputDialog(this,
+                "Enter your name:");
+
+        if(playerName == null || playerName.trim().equals("")){
+            playerName = "Player";
+        }
+
+        HighScoreManager.saveScore(playerName, score);
+
+        scoreSaved = true;
+    }
+
     private void checkLevelFinished(){
 
         if(isBossLevel()){
@@ -466,6 +488,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             win = true;
 
             gameTimer.stop();
+
+            saveFinalScore();
 
             return;
         }
@@ -897,6 +921,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                     if (lives <= 0) {
                         gameOver = true;
                         gameTimer.stop();
+                        saveFinalScore();
                     }
                 }
             }
@@ -931,6 +956,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                     if (lives <= 0) {
                         gameOver = true;
                         gameTimer.stop();
+                        saveFinalScore();
                     }
                 }
             }

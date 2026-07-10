@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+import java.util.ArrayList;
 
 public class MainMenu extends JPanel{
 
@@ -77,9 +78,38 @@ public class MainMenu extends JPanel{
             }
         });
 
+        highScoresButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showHighScores();
+            }
+        });
+
         gbc.gridy = 5;
 
         add(exitButton,gbc);
+    }
+
+    private void showHighScores(){
+
+        ArrayList<HighScore> scores = HighScoreManager.loadScores();
+
+        if(scores.size() == 0){
+            JOptionPane.showMessageDialog(this, "No high scores saved yet");
+            return;
+        }
+
+        String text = "";
+
+        for(int i = 0; i<scores.size(); i++){
+
+            HighScore highScore = scores.get(i);
+
+            text += (i + 1) + ". " + highScore.getPlayerName()
+                    + " - " + highScore.getScore() + "\n";
+        }
+
+        JOptionPane.showMessageDialog(this, text, "High Scores", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private JButton createMenuButton(String text){
