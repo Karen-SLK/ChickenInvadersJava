@@ -65,6 +65,26 @@ public class HighScoreManager {
         catch (IOException e){
             System.out.println("Error loading high scores");
         }
+
+        sortScores(scores);
+
         return scores;
+    }
+
+    private static void sortScores(ArrayList<HighScore> scores){
+
+        for(int i = 0; i<scores.size(); ++i){
+            for(int j = 0; j<scores.size()-i-1; ++j){
+
+                HighScore firstScore = scores.get(j);
+                HighScore secondScore = scores.get(j+1);
+
+                if(firstScore.getScore() < secondScore.getScore()){
+
+                    scores.set(j, secondScore);
+                    scores.set(j+1, firstScore);
+                }
+            }
+        }
     }
 }

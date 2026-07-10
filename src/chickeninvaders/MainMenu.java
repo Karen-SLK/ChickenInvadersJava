@@ -101,7 +101,13 @@ public class MainMenu extends JPanel{
 
         String text = "";
 
-        for(int i = 0; i<scores.size(); i++){
+        int count = scores.size();
+
+        if(count > 10){
+            count = 10;
+        }
+
+        for(int i = 0; i < count; i++){
 
             HighScore highScore = scores.get(i);
 
