@@ -48,6 +48,8 @@ public class GameMain {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         frame.setVisible(true);
+
+        SoundManager.playBackgroundMusic();
     }
 
     public void showMainMenu(){

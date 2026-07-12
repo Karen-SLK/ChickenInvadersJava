@@ -497,6 +497,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
             gameTimer.stop();
 
+            SoundManager.playWinSound();
+
             saveFinalScore();
 
             return;
@@ -856,6 +858,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                     explosions.add(explosion);
 
+                    SoundManager.playExplosionSound();
+
                     score += boss.getScoreValue();
 
                     boss = null;
@@ -890,6 +894,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                         explosions.add(explosion);
 
+                        SoundManager.playExplosionSound();
+
                         spawnPowerUp(enemyBoundsForPowerUp.x, enemyBoundsForPowerUp.y);
 
                         enemies.remove(j);
@@ -922,6 +928,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                 explosions.add(explosion);
 
+                SoundManager.playExplosionSound();
+
                 if(!shieldActive){
 
                     lives--;
@@ -929,6 +937,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                     if (lives <= 0) {
                         gameOver = true;
                         gameTimer.stop();
+                        SoundManager.playGameOverSound();
                         saveFinalScore();
                     }
                 }
@@ -957,6 +966,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                 explosions.add(explosion);
 
+                SoundManager.playExplosionSound();
+
                 if(!shieldActive) {
 
                     lives--;
@@ -964,6 +975,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                     if (lives <= 0) {
                         gameOver = true;
                         gameTimer.stop();
+                        SoundManager.playGameOverSound();
                         saveFinalScore();
                     }
                 }
@@ -1060,6 +1072,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
             bullets.add(bullet);
         }
+
+        SoundManager.playShotSound();
 
         lastShotTime = currentTime;
     }

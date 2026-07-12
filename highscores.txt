@@ -1,2 +1,4 @@
  karen,6945
 ali,100
+dil,1000
+Player,120

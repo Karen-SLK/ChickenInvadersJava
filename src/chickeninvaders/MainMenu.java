@@ -208,6 +208,13 @@ public class MainMenu extends JPanel{
             SoundSettings.setExplosionSoundOn(explosionSoundCheckBox.isSelected());
             SoundSettings.setGameResultSoundOn(gameResultSoundCheckBox.isSelected());
 
+            if(SoundSettings.isBackgroundMusicOn()){
+                SoundManager.playBackgroundMusic();
+            }
+            else{
+                SoundManager.stopBackgroundMusic();
+            }
+
             JOptionPane.showMessageDialog(this, "Sound settings saved.");
         }
     }
