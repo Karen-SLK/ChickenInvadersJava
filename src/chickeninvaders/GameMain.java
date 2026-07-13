@@ -30,6 +30,8 @@ public class GameMain {
 
         cardLayout = new CardLayout();
 
+        ImageManager.loadImages();
+
         mainPanel = new JPanel(cardLayout);
 
         mainMenu = new MainMenu(this);

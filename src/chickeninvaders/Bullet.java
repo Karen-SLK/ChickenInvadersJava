@@ -9,8 +9,8 @@ public class Bullet {
     private int x;
     private int y;
 
-    private int width = 6;
-    private int height = 15;
+    private int width = 18;
+    private int height = 32;
 
     private int speed = 8;
 
@@ -24,8 +24,22 @@ public class Bullet {
     }
 
     public void draw(Graphics g){
-        g.setColor(Color.YELLOW);
-        g.fillRect(x, y, width, height);
+
+        if(ImageManager.getShotImage() != null){
+
+            g.drawImage(
+                    ImageManager.getShotImage(),
+                    x,
+                    y,
+                    width,
+                    height,
+                    null
+            );
+        }
+        else{
+            g.setColor(Color.YELLOW);
+            g.fillRect(x, y, width, height);
+        }
     }
 
     public boolean isOutOfScreen(){

@@ -19,8 +19,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private int planeX;
     private int planeY;
 
-    private int planeWidth = 50;
-    private int planeHeight = 40;
+    private int planeWidth = 70;
+    private int planeHeight = 55;
 
     private int planeSpeed = 5;
 
@@ -1102,6 +1102,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         super.paintComponent(g);
 
+        drawBackground(g);
+
         drawHud(g);
         drawEnemies(g);
         drawBoss(g);
@@ -1187,12 +1189,44 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private void drawPlane(Graphics g){
 
-        g.setColor(Color.CYAN);
+        if(ImageManager.getAirplaneImage() != null){
 
-        int[] xPoints = {planeX + planeWidth/2,planeX,planeX + planeWidth};
-        int[] yPoints ={planeY,planeY + planeHeight,planeY + planeHeight};
+            g.drawImage(
+                    ImageManager.getAirplaneImage(),
+                    planeX,
+                    planeY,
+                    planeWidth,
+                    planeHeight,
+                    null
+            );
+        }
+        else{
+            g.setColor(Color.CYAN);
 
-        g.fillPolygon(xPoints,yPoints,3);
+            int[] xPoints = {planeX + planeWidth / 2, planeX, planeX + planeWidth};
+            int[] yPoints = {planeY, planeY + planeHeight, planeY + planeHeight};
+
+            g.fillPolygon(xPoints, yPoints, 3);
+        }
+    }
+
+    private void drawBackground(Graphics g){
+
+        if(ImageManager.getBackgroundImage() != null){
+
+            g.drawImage(
+                    ImageManager.getBackgroundImage(),
+                    0,
+                    0,
+                    getWidth(),
+                    getHeight(),
+                    null
+            );
+        }
+        else{
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
     }
 
     private void drawEggs(Graphics g){
