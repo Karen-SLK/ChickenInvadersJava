@@ -25,18 +25,27 @@ public class Explosion {
 
     public void draw(Graphics g){
 
-        int radius = (maxLife - life) * 2 +10;
+        int size = (maxLife - life) * 3 + 25;
 
-        int drawX = x - radius / 2;
-        int drawY = y - radius / 2;
+        if(ImageManager.getExplosionImage() != null){
 
-        g.setColor(Color.ORANGE);
+            g.drawImage(
+                    ImageManager.getExplosionImage(),
+                    x - size / 2,
+                    y - size / 2,
+                    size,
+                    size,
+                    null
+            );
+        }
+        else{
 
-        g.fillOval(drawX, drawY, radius, radius);
+            g.setColor(Color.ORANGE);
+            g.fillOval(x - size / 2, y - size / 2, size, size);
 
-        g.setColor(Color.RED);
-
-        g.fillOval(drawX + radius / 4, drawY + radius / 4, radius / 2, radius / 2);
+            g.setColor(Color.RED);
+            g.drawOval(x - size / 2, y - size / 2, size, size);
+        }
     }
 
     public boolean isFinished(){

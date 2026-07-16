@@ -3,6 +3,7 @@ package chickeninvaders;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 
 public class Enemy {
@@ -62,6 +63,24 @@ public class Enemy {
         }
     }
 
+    private BufferedImage getEnemyImage(){
+
+        if(type.equals(NORMAL)){
+            return ImageManager.getNormalChickenImage();
+        }
+        else if(type.equals(FAST)){
+            return ImageManager.getFastChickenImage();
+        }
+        else if(type.equals(ZIGZAG)){
+            return ImageManager.getZigzagChickenImage();
+        }
+        else if(type.equals(SHOOTER)){
+            return ImageManager.getShooterChickenImage();
+        }
+
+        return null;
+    }
+
     public void update(int direction, int speed){
 
         int currentSpeed = speed;
@@ -91,26 +110,39 @@ public class Enemy {
 
     public void draw(Graphics g){
 
-        if (type.equals(NORMAL)) {
-            g.setColor(Color.WHITE);
-        }
-        else if (type.equals(FAST)) {
-            g.setColor(Color.YELLOW);
-        }
-        else if (type.equals(ZIGZAG)) {
-            g.setColor(Color.GREEN);
-        }
-        else if (type.equals(SHOOTER)) {
-            g.setColor(Color.RED);
+        BufferedImage enemyImage = getEnemyImage();
+
+        if(enemyImage != null){
+
+            g.drawImage(
+                    enemyImage,
+                    x,
+                    y,
+                    width,
+                    height,
+                    null
+            );
         }
 
-        g.fillOval(x, y, width, height);
+        else {
+            if (type.equals(NORMAL)) {
+                g.setColor(Color.WHITE);
+            } else if (type.equals(FAST)) {
+                g.setColor(Color.YELLOW);
+            } else if (type.equals(ZIGZAG)) {
+                g.setColor(Color.GREEN);
+            } else if (type.equals(SHOOTER)) {
+                g.setColor(Color.RED);
+            }
 
-        g.setColor(Color.ORANGE);
-        g.fillRect(x + width / 2 - 4, y + height / 2, 8, 6);
+            g.fillOval(x, y, width, height);
 
-        g.setColor(Color.BLACK);
-        g.drawString(getShortName(), x + 12, y + 22);
+            g.setColor(Color.ORANGE);
+            g.fillRect(x + width / 2 - 4, y + height / 2, 8, 6);
+
+            g.setColor(Color.BLACK);
+            g.drawString(getShortName(), x + 12, y + 22);
+        }
     }
 
     private String getShortName() {

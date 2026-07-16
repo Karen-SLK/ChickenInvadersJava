@@ -9,8 +9,8 @@ public class Egg {
     private int x;
     private int y;
 
-    private int width = 10;
-    private int height = 14;
+    private int width = 18;
+    private int height = 24;
 
     private int speed = 4;
 
@@ -25,8 +25,22 @@ public class Egg {
 
     public void draw(Graphics g){
 
-        g.setColor(Color.WHITE);
-        g.fillOval(x, y, width, height);
+        if(ImageManager.getEggImage() != null){
+
+            g.drawImage(ImageManager.getEggImage(),
+                    x,
+                    y,
+                    width,
+                    height,
+                    null);
+        }
+
+        else{
+            g.setColor(Color.WHITE);
+            g.fillOval(x, y, width, height);
+        }
+
+
     }
 
     public boolean isOutOfScreen(int panelHeight){
