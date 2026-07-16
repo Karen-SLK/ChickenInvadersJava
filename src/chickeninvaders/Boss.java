@@ -31,12 +31,12 @@ public class Boss {
         y = 60;
 
         if(level == 4){
-            maxHealth = 25;
+            maxHealth = 50;
             speed = 2;
             scoreValue = 500;
         }
         else{
-            maxHealth = 45;
+            maxHealth = 100;
             speed = 3;
             scoreValue = 1000;
         }

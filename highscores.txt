@@ -1,7 +1,2 @@
- karen,6945
-ali,100
-dil,1000
-Player,120
-pop  ,4855
-me,6945
-Player,6945
+ ka,4410
+Player,0

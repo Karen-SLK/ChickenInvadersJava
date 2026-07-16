@@ -762,42 +762,64 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private void updateBossAttacks(){
 
-        if(boss == null){
-            return;
-        }
+       if (boss == null){
+           return;
+       }
 
-        long currentTime = System.currentTimeMillis();
+       long currentTime = System.currentTimeMillis();
 
-        if(currentTime - lastBossShotTime < bossShotDelay){
-            return;
-        }
+       if(currentTime - lastBossShotTime < bossShotDelay){
+           return;
+       }
 
-        Rectangle bossBounds = boss.getBounds();
+       Rectangle bossBounds = boss.getBounds();
 
-        int bossCenterX = bossBounds.x + bossBounds.width / 2;
-        int planeCenterX = planeX + planeWidth / 2;
+       int bossCenterX = bossBounds.x + bossBounds.width / 2;
+       int bossCenterY = bossBounds.y + bossBounds.height / 2;
 
-        int speedX = 0;
+       if(level == 4){
 
-        if(planeCenterX < bossCenterX - 20){
-            speedX = -3;
-        }
-        else if(planeCenterX > bossCenterX + 20){
-            speedX = 3;
-        }
+           addBossBullet(bossCenterX, bossCenterY, 0, -4);
 
-        int speedY = 5;
+           addBossBullet(bossCenterX, bossCenterY, 0, 4);
+
+           addBossBullet(bossCenterX, bossCenterY, -4, 0);
+
+           addBossBullet(bossCenterX, bossCenterY, 4, 0);
+       }
+
+       else if(level == 8){
+
+           addBossBullet(bossCenterX, bossCenterY, 0, -5);
+
+           addBossBullet(bossCenterX, bossCenterY, 4, -4);
+
+           addBossBullet(bossCenterX, bossCenterY, 5, 0);
+
+           addBossBullet(bossCenterX, bossCenterY, 4, 4);
+
+           addBossBullet(bossCenterX, bossCenterY, 0, 5);
+
+           addBossBullet(bossCenterX, bossCenterY, -4, 4);
+
+           addBossBullet(bossCenterX, bossCenterY, -5, 0);
+
+           addBossBullet(bossCenterX, bossCenterY, -4, -4);
+       }
+
+       lastBossShotTime = currentTime;
+    }
+
+    private void addBossBullet(int x, int y, int speedX, int speedY){
 
         EnemyBullet bullet = new EnemyBullet(
-                bossCenterX - 5,
-                bossBounds.y + bossBounds.height,
+                x-5,
+                y-5,
                 speedX,
                 speedY
         );
 
         enemyBullets.add(bullet);
-
-        lastBossShotTime = currentTime;
     }
 
     private void spawnPowerUp(int x, int y){
