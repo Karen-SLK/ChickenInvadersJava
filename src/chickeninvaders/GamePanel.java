@@ -476,7 +476,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             playerName = "Player";
         }
 
-        HighScoreManager.saveScore(playerName, score);
+        int finalLevel = level;
+
+        if(finalLevel > maxLevel){
+            finalLevel = maxLevel;
+        }
+
+        HighScoreManager.saveScore(playerName, score, finalLevel);
 
         scoreSaved = true;
     }

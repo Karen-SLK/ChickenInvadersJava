@@ -125,8 +125,12 @@ public class MainMenu extends JPanel{
 
             HighScore highScore = scores.get(i);
 
-            text += (i + 1) + ". " + highScore.getPlayerName()
-                    + " - " + highScore.getScore() + "\n";
+            text += (i + 1) + ". "
+                    + highScore.getPlayerName()
+                    + " | Score: " + highScore.getScore()
+                    + " | Level: " + highScore.getLevelReached()
+                    + " | Date: " + highScore.getDateTime()
+                    + "\n";
         }
 
         JOptionPane.showMessageDialog(this, text, "High Scores", JOptionPane.INFORMATION_MESSAGE);

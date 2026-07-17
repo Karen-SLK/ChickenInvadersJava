@@ -6,10 +6,19 @@ public class HighScore {
 
     private int score;
 
-    public HighScore(String playerName, int score){
+    private int levelReached;
+
+    private String dateTime;
+
+    public HighScore(String playerName, int score, int levelReached, String dateTime){
 
         this.playerName = playerName;
+
         this.score = score;
+
+        this.levelReached = levelReached;
+
+        this.dateTime = dateTime;
     }
 
     public String getPlayerName(){
@@ -20,7 +29,15 @@ public class HighScore {
         return score;
     }
 
+    public int getLevelReached(){
+        return levelReached;
+    }
+
+    public String getDateTime(){
+        return dateTime;
+    }
+
     public String toFileString(){
-        return playerName + "," + score;
+        return playerName + "," + score + "," + levelReached + "," + dateTime;
     }
 }

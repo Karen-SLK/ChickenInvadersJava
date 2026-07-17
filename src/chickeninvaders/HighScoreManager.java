@@ -1,13 +1,20 @@
 package chickeninvaders;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class HighScoreManager {
 
     private static final String FILE_NAME = "highscores.txt";
 
-    public static void saveScore(String playerName, int score){
+    public static void saveScore(String playerName, int score, int levelReached){
 
         try{
 
@@ -15,7 +22,16 @@ public class HighScoreManager {
 
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
-            HighScore highScore = new HighScore(playerName,score);
+            String dateTime = LocalDateTime.now().format(
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            );
+
+            HighScore highScore = new HighScore(
+                    playerName,
+                    score,
+                    levelReached,
+                    dateTime
+            );
 
             bufferedWriter.write(highScore.toFileString());
 
@@ -50,25 +66,67 @@ public class HighScoreManager {
 
                 String[] parts = line.split(",");
 
-                if(parts.length == 2){
+                if(parts.length >= 4){
 
-                    String name = parts[0];
+                    String playerName = parts[0];
+                    int score = Integer.parseInt(parts[1]);
+                    int levelReached = Integer.parseInt(parts[2]);
+                    String dateTime = parts[3];
 
+                    HighScore highScore = new HighScore(
+                            playerName,
+                            score,
+                            levelReached,
+                            dateTime
+                    );
+
+                    addOrUpdateBestScore(scores, highScore);
+                }
+
+                else if(parts.length >= 2){
+
+                    String playerName = parts[0];
                     int score = Integer.parseInt(parts[1]);
 
-                    scores.add(new HighScore(name, score));
+                    HighScore highScore = new HighScore(
+                            playerName,
+                            score,
+                            1,
+                            "Unknown"
+                    );
+
+                    addOrUpdateBestScore(scores, highScore);
                 }
             }
 
             bufferedReader.close();
         }
-        catch (IOException e){
+        catch (Exception e){
             System.out.println("Error loading high scores");
         }
 
         sortScores(scores);
 
         return scores;
+    }
+
+    private static void addOrUpdateBestScore(ArrayList<HighScore> scores, HighScore newScore){
+
+        for(int i = 0; i<scores.size(); ++i){
+
+            HighScore currentScore = scores.get(i);
+
+            if(currentScore.getPlayerName().equals(newScore.getPlayerName())){
+
+                if(newScore.getScore() > currentScore.getScore()){
+                    scores.set(i, newScore);
+                }
+
+                return;
+            }
+        }
+
+        scores.add(newScore);
     }
 
     private static void sortScores(ArrayList<HighScore> scores){
