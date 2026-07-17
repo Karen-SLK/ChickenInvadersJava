@@ -430,7 +430,15 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
            }
            else{
                updateEnemies();
+
+               checkEnemiesReachedBottom();
+
+               if(gameOver){
+                   return;
+               }
+
                updateEnemyEggDropping();
+
                updateShooterAttacks();
            }
 
@@ -530,6 +538,31 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         lastShooterShotTime = System.currentTimeMillis();
 
         lastBossShotTime = System.currentTimeMillis();
+    }
+
+    private void checkEnemiesReachedBottom(){
+
+        if(boss != null){
+            return;
+        }
+
+        for(int i = 0; i<enemies.size(); ++i){
+
+            Enemy enemy = enemies.get(i);
+
+            if(enemy.getY() + enemy.getHeight() >= getHeight()){
+
+                gameOver = true;
+
+                gameTimer.stop();
+
+                SoundManager.playGameOverSound();
+
+                saveFinalScore();
+
+                return;
+            }
+        }
     }
 
     private void updatePlane(){
