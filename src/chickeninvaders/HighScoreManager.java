@@ -1,108 +1,102 @@
 package chickeninvaders;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 
 public class HighScoreManager {
 
-    private static final String FILE_NAME = "highscores.txt";
-
     public static void saveScore(String playerName, int score, int levelReached){
+
+        String sql =
+                "INSERT INTO game_records ("
+                        + "username, score, level_reached, "
+                        + "background_music_on, shot_sound_on, explosion_sound_on, game_result_sound_on"
+                        + ") VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try{
 
-            FileWriter fileWriter = new FileWriter(FILE_NAME,true);
+            Connection connection = DatabaseManager.getConnection();
 
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            if(connection == null){
 
-            String dateTime = LocalDateTime.now().format(
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-            );
+                return;
+            }
 
-            HighScore highScore = new HighScore(
-                    playerName,
-                    score,
-                    levelReached,
-                    dateTime
-            );
+            PreparedStatement statement = connection.prepareStatement(sql);
 
-            bufferedWriter.write(highScore.toFileString());
+            statement.setString(1, playerName);
 
-            bufferedWriter.newLine();
+            statement.setInt(2, score);
 
-            bufferedWriter.close();
+            statement.setInt(3, levelReached);
+
+            statement.setInt(4, booleanToInt(SoundSettings.isBackgroundMusicOn()));
+
+            statement.setInt(5, booleanToInt(SoundSettings.isShotSoundOn()));
+
+            statement.setInt(6, booleanToInt(SoundSettings.isExplosionSoundOn()));
+
+            statement.setInt(7, booleanToInt(SoundSettings.isGameResultSoundOn()));
+
+            statement.executeUpdate();
+
+            statement.close();
+            connection.close();
         }
-        catch (IOException e) {
-            System.out.println("Error saving high score");
-
+        catch(Exception e){
+            System.out.println("Error saving game record.");
+            System.out.println(e.getMessage());
         }
     }
 
-    public static  ArrayList<HighScore> loadScores(){
+    public static ArrayList<HighScore> loadScores(){
 
         ArrayList<HighScore> scores = new ArrayList<>();
+        // List high score ha.
 
-        File file = new File(FILE_NAME);
-
-        if(!file.exists()){
-            return scores;
-        }
+        String sql =
+                "SELECT username, score, level_reached, played_at "
+                        + "FROM game_records "
+                        + "ORDER BY score DESC";
 
         try{
-            FileReader fileReader = new FileReader(FILE_NAME);
 
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            Connection connection = DatabaseManager.getConnection();
 
-            String line;
-
-            while ((line = bufferedReader.readLine()) != null){
-
-                String[] parts = line.split(",");
-
-                if(parts.length >= 4){
-
-                    String playerName = parts[0];
-                    int score = Integer.parseInt(parts[1]);
-                    int levelReached = Integer.parseInt(parts[2]);
-                    String dateTime = parts[3];
-
-                    HighScore highScore = new HighScore(
-                            playerName,
-                            score,
-                            levelReached,
-                            dateTime
-                    );
-
-                    addOrUpdateBestScore(scores, highScore);
-                }
-
-                else if(parts.length >= 2){
-
-                    String playerName = parts[0];
-                    int score = Integer.parseInt(parts[1]);
-
-                    HighScore highScore = new HighScore(
-                            playerName,
-                            score,
-                            1,
-                            "Unknown"
-                    );
-
-                    addOrUpdateBestScore(scores, highScore);
-                }
+            if(connection == null){
+                return scores;
             }
 
-            bufferedReader.close();
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while(resultSet.next()){
+
+                String playerName = resultSet.getString("username");
+                int score = resultSet.getInt("score");
+                int levelReached = resultSet.getInt("level_reached");
+                String dateTime = resultSet.getString("played_at");
+
+                HighScore highScore = new HighScore(
+                        playerName,
+                        score,
+                        levelReached,
+                        dateTime
+                );
+
+                addOrUpdateBestScore(scores, highScore);
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
         }
-        catch (Exception e){
-            System.out.println("Error loading high scores");
+        catch(Exception e){
+            System.out.println("Error loading high scores from database.");
+            System.out.println(e.getMessage());
         }
 
         sortScores(scores);
@@ -112,13 +106,14 @@ public class HighScoreManager {
 
     private static void addOrUpdateBestScore(ArrayList<HighScore> scores, HighScore newScore){
 
-        for(int i = 0; i<scores.size(); ++i){
+        for(int i = 0; i < scores.size(); i++){
 
             HighScore currentScore = scores.get(i);
 
             if(currentScore.getPlayerName().equals(newScore.getPlayerName())){
 
                 if(newScore.getScore() > currentScore.getScore()){
+
                     scores.set(i, newScore);
                 }
 
@@ -131,18 +126,28 @@ public class HighScoreManager {
 
     private static void sortScores(ArrayList<HighScore> scores){
 
-        for(int i = 0; i<scores.size(); ++i){
-            for(int j = 0; j<scores.size()-i-1; ++j){
+        for(int i = 0; i < scores.size() - 1; i++){
+
+            for(int j = 0; j < scores.size() - i - 1; j++){
 
                 HighScore firstScore = scores.get(j);
-                HighScore secondScore = scores.get(j+1);
+                HighScore secondScore = scores.get(j + 1);
 
                 if(firstScore.getScore() < secondScore.getScore()){
 
                     scores.set(j, secondScore);
-                    scores.set(j+1, firstScore);
+                    scores.set(j + 1, firstScore);
                 }
             }
         }
+    }
+
+    private static int booleanToInt(boolean value){
+
+        if(value){
+            return 1;
+        }
+
+        return 0;
     }
 }
