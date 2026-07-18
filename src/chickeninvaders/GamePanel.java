@@ -469,20 +469,37 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             return;
         }
 
-        String playerName = JOptionPane.showInputDialog(this,
-                "Enter your name:");
-
-        if(playerName == null || playerName.trim().equals("")){
-            playerName = "Player";
-        }
-
         int finalLevel = level;
 
         if(finalLevel > maxLevel){
             finalLevel = maxLevel;
         }
 
-        HighScoreManager.saveScore(playerName, score, finalLevel);
+        User currentUser = gameMain.getCurrentUser();
+
+        if(currentUser != null){
+
+            String username = currentUser.getUsername();
+
+            HighScoreManager.saveScore(username, score, finalLevel);
+
+            if(score > currentUser.getHighestScore()){
+
+                currentUser.setHighestScore(score);
+            }
+
+            currentUser.setLastLevel(finalLevel);
+
+            currentUser.setBackgroundMusicOn(SoundSettings.isBackgroundMusicOn());
+            currentUser.setShotSoundOn(SoundSettings.isShotSoundOn());
+            currentUser.setExplosionSoundOn(SoundSettings.isExplosionSoundOn());
+            currentUser.setGameResultSoundOn(SoundSettings.isGameResultSoundOn());
+
+            UserManager.updateUser(currentUser);
+        }
+        else{
+            HighScoreManager.saveScore("Player", score, finalLevel);
+        }
 
         scoreSaved = true;
     }
@@ -1194,13 +1211,28 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial",Font.BOLD,18));
 
-        g.drawString("Level: " + level,20,30);
-        g.drawString("Score: " + score,130,30);
-        g.drawString("Lives: " + lives,250,30);
-        g.drawString("Fire: " + fireLevel,360,30);
-        g.drawString("SPACE: shoot",470,30);
-        g.drawString("P: pause",630,30);
-        g.drawString("ESC: menu",630,55);
+        String username = "Guest";
+
+        if(gameMain.getCurrentUser() != null){
+
+            username = gameMain.getCurrentUser().getUsername();
+        }
+
+        g.drawString("User: " + username, 20, 25);
+
+        g.drawString("Level: " + level, 20, 50);
+
+        g.drawString("Score: " + score, 130, 50);
+
+        g.drawString("Lives: " + lives, 250, 50);
+
+        g.drawString("Fire: " + fireLevel, 360, 50);
+
+        g.drawString("SPACE: shoot", 470, 50);
+
+        g.drawString("P: pause", 630, 50);
+
+        g.drawString("ESC: menu", 630, 75);
 
         String status = "";
 

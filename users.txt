@@ -1,0 +1,3 @@
+katren,1234,0,1,true,true,true,true
+mahdi,321,250,1,true,true,true,true
+ali,1234,70,1,true,true,true,true
