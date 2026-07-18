@@ -220,14 +220,39 @@ public class MainMenu extends JPanel{
             SoundSettings.setGameResultSoundOn(gameResultSoundCheckBox.isSelected());
 
             if(SoundSettings.isBackgroundMusicOn()){
+
                 SoundManager.playBackgroundMusic();
             }
             else{
+
                 SoundManager.stopBackgroundMusic();
             }
 
+            saveSoundSettingsForCurrentUser();
+
             JOptionPane.showMessageDialog(this, "Sound settings saved.");
+
         }
+    }
+
+    private void saveSoundSettingsForCurrentUser(){
+
+        User currentUser = gameMain.getCurrentUser();
+
+        if(currentUser == null){
+
+            return;
+        }
+
+        currentUser.setBackgroundMusicOn(SoundSettings.isBackgroundMusicOn());
+
+        currentUser.setShotSoundOn(SoundSettings.isShotSoundOn());
+
+        currentUser.setExplosionSoundOn(SoundSettings.isExplosionSoundOn());
+
+        currentUser.setGameResultSoundOn(SoundSettings.isGameResultSoundOn());
+
+        UserManager.updateUser(currentUser);
     }
 
     private void showLoginRegisterDialog(){
