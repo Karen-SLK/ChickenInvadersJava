@@ -43,7 +43,14 @@ public class MainMenu extends JPanel{
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                gameMain.startNewGame();
+                if(gameMain.getCurrentUser() == null){
+
+                    showLoginRegisterDialog();
+                }
+                else{
+
+                    gameMain.startNewGame();
+                }
             }
         });
 
@@ -220,6 +227,125 @@ public class MainMenu extends JPanel{
             }
 
             JOptionPane.showMessageDialog(this, "Sound settings saved.");
+        }
+    }
+
+    private void showLoginRegisterDialog(){
+
+        String[] options = {"Login", "Register", "Cancel"};
+
+        int result = JOptionPane.showOptionDialog(
+                this,
+                "You need to login or register before starting the game.",
+                "User Account",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if(result == 0){
+
+            showLoginDialog();
+        }
+        else if(result == 1){
+
+            showRegisterDialog();
+        }
+    }
+
+    private void showLoginDialog(){
+
+        JTextField usernameField = new JTextField();
+
+        JPasswordField passwordField = new JPasswordField();
+
+        JPanel panel = new JPanel(new GridLayout(2, 2, 10, 10));
+
+        panel.add(new JLabel("Username:"));
+        panel.add(usernameField);
+
+        panel.add(new JLabel("Password:"));
+        panel.add(passwordField);
+
+        int result = JOptionPane.showConfirmDialog(
+                this,
+                panel,
+                "Login",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        );
+
+        if(result == JOptionPane.OK_OPTION){
+
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+
+            User user = UserManager.loginUser(username, password);
+
+            if(user == null){
+
+                JOptionPane.showMessageDialog(this,
+                        "Invalid username or password.");
+            }
+            else{
+
+                gameMain.setCurrentUser(user);
+
+                JOptionPane.showMessageDialog(this,
+                        "Login successful. Welcome " + user.getUsername() + ".");
+
+                gameMain.startNewGame();
+            }
+        }
+    }
+
+    private void showRegisterDialog(){
+
+        JTextField usernameField = new JTextField();
+
+        JPasswordField passwordField = new JPasswordField();
+
+        JPanel panel = new JPanel(new GridLayout(2, 2, 10, 10));
+
+        panel.add(new JLabel("Username:"));
+        panel.add(usernameField);
+
+        panel.add(new JLabel("Password:"));
+        panel.add(passwordField);
+
+        int result = JOptionPane.showConfirmDialog(
+                this,
+                panel,
+                "Register",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        );
+
+        if(result == JOptionPane.OK_OPTION){
+
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+
+            boolean registered = UserManager.registerUser(username, password);
+
+            if(!registered){
+
+                JOptionPane.showMessageDialog(this,
+                        "Register failed. Username may be empty or already taken.");
+            }
+            else{
+
+                User user = UserManager.loginUser(username, password);
+
+                gameMain.setCurrentUser(user);
+
+                JOptionPane.showMessageDialog(this,
+                        "Register successful. Welcome " + user.getUsername() + ".");
+
+                gameMain.startNewGame();
+            }
         }
     }
 }

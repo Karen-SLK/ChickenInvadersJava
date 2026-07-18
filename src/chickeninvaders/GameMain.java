@@ -24,6 +24,8 @@ public class GameMain {
     private MainMenu mainMenu;
     private GamePanel gamePanel;
 
+    private User currentUser;
+
     public GameMain(){
 
         frame = new JFrame("Chicken Invaders");
@@ -65,6 +67,38 @@ public class GameMain {
         cardLayout.show(mainPanel,GAME_CARD);
         gamePanel.startGame();
     }
+
+    public User getCurrentUser(){
+        return currentUser;
+    }
+
+    public void setCurrentUser(User currentUser){
+
+        this.currentUser = currentUser;
+
+        if(currentUser != null){
+
+            applyUserSoundSettings(currentUser);
+        }
+    }
+
+    private void applyUserSoundSettings(User user){
+
+        SoundSettings.setBackgroundMusicOn(user.isBackgroundMusicOn());
+        SoundSettings.setShotSoundOn(user.isShotSoundOn());
+        SoundSettings.setExplosionSoundOn(user.isExplosionSoundOn());
+        SoundSettings.setGameResultSoundOn(user.isGameResultSoundOn());
+
+        if(SoundSettings.isBackgroundMusicOn()){
+
+            SoundManager.playBackgroundMusic();
+        }
+        else{
+
+            SoundManager.stopBackgroundMusic();
+        }
+    }
+
 
     public static void main(String[] args){
         SwingUtilities.invokeLater(new Runnable() {
