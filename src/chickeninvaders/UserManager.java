@@ -1,15 +1,11 @@
 package chickeninvaders;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 
 public class UserManager {
-
-    private static final String FILE_NAME = "users.txt";
 
     public static boolean registerUser(String username, String password){
 
@@ -17,18 +13,46 @@ public class UserManager {
         password = cleanText(password);
 
         if(username.equals("") || password.equals("")){
+
             return false;
         }
 
         if(isUsernameTaken(username)){
+
             return false;
         }
 
-        User user = new User(username, password);
+        String sql =
+                "INSERT INTO users ("
+                        + "username, password, highest_score, last_level, "
+                        + "background_music_on, shot_sound_on, explosion_sound_on, game_result_sound_on"
+                        + ") VALUES (?, ?, 0, 1, 1, 1, 1, 1)";
 
-        saveNewUser(user);
+        try{
 
-        return true;
+            Connection connection = DatabaseManager.getConnection();
+
+            if(connection == null){
+                return false;
+            }
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            statement.setString(1, username);
+            statement.setString(2, password);
+
+            statement.executeUpdate();
+
+            statement.close();
+            connection.close();
+
+            return true;
+        }
+        catch(Exception e){
+            System.out.println("Error registering user.");
+            System.out.println(e.getMessage());
+            return false;
+        }
     }
 
     public static User loginUser(String username, String password){
@@ -36,155 +60,203 @@ public class UserManager {
         username = cleanText(username);
         password = cleanText(password);
 
-        ArrayList<User> users = loadUsers();
+        String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
 
-        for(int i = 0; i < users.size(); i++){
+        try{
 
-            User user = users.get(i);
+            Connection connection = DatabaseManager.getConnection();
 
-            if(user.getUsername().equals(username)
-                    && user.getPassword().equals(password)){
-
-                return user;
+            if(connection == null){
+                return null;
             }
-        }
 
-        return null;
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            statement.setString(1, username);
+            statement.setString(2, password);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            User user = null;
+
+            if(resultSet.next()){
+
+                user = createUserFromResultSet(resultSet);
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+
+            return user;
+        }
+        catch(Exception e){
+            System.out.println("Error logging in user.");
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
     public static boolean isUsernameTaken(String username){
 
         username = cleanText(username);
 
-        ArrayList<User> users = loadUsers();
+        String sql = "SELECT username FROM users WHERE username = ?";
 
-        for(int i = 0; i < users.size(); i++){
+        try{
 
-            User user = users.get(i);
+            Connection connection = DatabaseManager.getConnection();
 
-            if(user.getUsername().equals(username)){
-                return true;
+            if(connection == null){
+                return false;
             }
-        }
 
-        return false;
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            statement.setString(1, username);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            boolean exists = resultSet.next();
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+
+            return exists;
+        }
+        catch(Exception e){
+            System.out.println("Error checking username.");
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    public static void updateUser(User updatedUser){
+
+        String sql =
+                "UPDATE users SET "
+                        + "password = ?, "
+                        + "highest_score = ?, "
+                        + "last_level = ?, "
+                        + "background_music_on = ?, "
+                        + "shot_sound_on = ?, "
+                        + "explosion_sound_on = ?, "
+                        + "game_result_sound_on = ? "
+                        + "WHERE username = ?";
+
+        try{
+
+            Connection connection = DatabaseManager.getConnection();
+
+            if(connection == null){
+                return;
+            }
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            statement.setString(1, updatedUser.getPassword());
+            statement.setInt(2, updatedUser.getHighestScore());
+            statement.setInt(3, updatedUser.getLastLevel());
+            statement.setInt(4, booleanToInt(updatedUser.isBackgroundMusicOn()));
+            statement.setInt(5, booleanToInt(updatedUser.isShotSoundOn()));
+            statement.setInt(6, booleanToInt(updatedUser.isExplosionSoundOn()));
+            statement.setInt(7, booleanToInt(updatedUser.isGameResultSoundOn()));
+            statement.setString(8, updatedUser.getUsername());
+
+            statement.executeUpdate();
+
+            statement.close();
+            connection.close();
+        }
+        catch(Exception e){
+            System.out.println("Error updating user.");
+            System.out.println(e.getMessage());
+        }
     }
 
     public static ArrayList<User> loadUsers(){
 
         ArrayList<User> users = new ArrayList<>();
 
-        File file = new File(FILE_NAME);
-
-        if(!file.exists()){
-            return users;
-        }
+        String sql = "SELECT * FROM users";
 
         try{
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-            String line;
+            Connection connection = DatabaseManager.getConnection();
 
-            while((line = bufferedReader.readLine()) != null){
-
-                String[] parts = line.split(",");
-
-                if(parts.length >= 8){
-
-                    String username = parts[0];
-                    String password = parts[1];
-
-                    int highestScore = Integer.parseInt(parts[2]);
-                    int lastLevel = Integer.parseInt(parts[3]);
-
-                    boolean backgroundMusicOn = Boolean.parseBoolean(parts[4]);
-                    boolean shotSoundOn = Boolean.parseBoolean(parts[5]);
-                    boolean explosionSoundOn = Boolean.parseBoolean(parts[6]);
-                    boolean gameResultSoundOn = Boolean.parseBoolean(parts[7]);
-
-                    User user = new User(
-                            username,
-                            password,
-                            highestScore,
-                            lastLevel,
-                            backgroundMusicOn,
-                            shotSoundOn,
-                            explosionSoundOn,
-                            gameResultSoundOn
-                    );
-
-                    users.add(user);
-                }
+            if(connection == null){
+                return users;
             }
 
-            bufferedReader.close();
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while(resultSet.next()){
+
+                User user = createUserFromResultSet(resultSet);
+
+                users.add(user);
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
         }
-        catch (Exception e) {
-            System.out.println("Error loading users");
+        catch(Exception e){
+            System.out.println("Error loading users.");
+            System.out.println(e.getMessage());
         }
 
         return users;
     }
 
-    private static void saveNewUser(User user){
+    private static User createUserFromResultSet(ResultSet resultSet){
 
         try{
 
-            FileWriter fileWriter = new FileWriter(FILE_NAME, true);
+            String username = resultSet.getString("username");
+            String password = resultSet.getString("password");
 
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            int highestScore = resultSet.getInt("highest_score");
+            int lastLevel = resultSet.getInt("last_level");
 
-            bufferedWriter.write(user.toFileString());
+            boolean backgroundMusicOn = intToBoolean(resultSet.getInt("background_music_on"));
+            boolean shotSoundOn = intToBoolean(resultSet.getInt("shot_sound_on"));
+            boolean explosionSoundOn = intToBoolean(resultSet.getInt("explosion_sound_on"));
+            boolean gameResultSoundOn = intToBoolean(resultSet.getInt("game_result_sound_on"));
 
-            bufferedWriter.newLine();
-
-            bufferedWriter.close();
-        } catch (Exception e) {
-            System.out.println("Error saving user");
-        }
-    }
-
-    public static void updateUser(User updatedUser){
-
-        ArrayList<User> users = loadUsers();
-
-        for(int i = 0; i < users.size(); i++){
-
-            User user = users.get(i);
-
-            if(user.getUsername().equals(updatedUser.getUsername())){
-
-                users.set(i, updatedUser);
-
-                break;
-            }
-        }
-
-        saveAllUsers(users);
-    }
-
-    private static void saveAllUsers(ArrayList<User> users){
-
-        try{
-
-            FileWriter fileWriter = new FileWriter(FILE_NAME, false);
-
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-            for(int i = 0; i < users.size(); i++){
-
-                User user = users.get(i);
-
-                bufferedWriter.write(user.toFileString());
-                bufferedWriter.newLine();
-            }
-
-            bufferedWriter.close();
+            return new User(
+                    username,
+                    password,
+                    highestScore,
+                    lastLevel,
+                    backgroundMusicOn,
+                    shotSoundOn,
+                    explosionSoundOn,
+                    gameResultSoundOn
+            );
         }
         catch(Exception e){
-            System.out.println("Error updating users.");
+            System.out.println("Error creating user from database.");
+            System.out.println(e.getMessage());
+            return null;
         }
+    }
+
+    private static int booleanToInt(boolean value){
+
+        if(value){
+            return 1;
+        }
+
+        return 0;
+    }
+
+    private static boolean intToBoolean(int value){
+
+        return value == 1;
     }
 
     private static String cleanText(String text){
@@ -194,7 +266,6 @@ public class UserManager {
         }
 
         text = text.trim();
-
         text = text.replace(",", "");
 
         return text;
