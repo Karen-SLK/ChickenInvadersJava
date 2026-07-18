@@ -32,6 +32,8 @@ public class GameMain {
 
         cardLayout = new CardLayout();
 
+        DatabaseManager.testConnection();
+
         ImageManager.loadImages();
 
         mainPanel = new JPanel(cardLayout);
