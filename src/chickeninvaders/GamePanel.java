@@ -99,6 +99,20 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private boolean paused;
 
+    private int enemyRows = 5;
+
+    private int enemyCols = 8;
+
+    private int enemyStartX = 80;
+
+    private int enemyStartY = 80;
+
+    private int enemyGapX = 80;
+
+    private int enemyGapY = 55;
+
+    private int[][] cellCounters;
+
     public GamePanel(GameMain gameMain){
 
         this.gameMain = gameMain;
@@ -186,6 +200,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             createBoss();
         }
         else{
+            setupCellCounters();
+
             createEnemies();
         }
 
@@ -269,26 +285,65 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         return level == 4 || level == 8;
     }
 
+    private void setupCellCounters(){
+
+        cellCounters = new int[enemyRows][enemyCols];
+
+        int initialCounter = getInitialCellCounter();
+
+        for(int row = 0; row < enemyRows; row++){
+
+            for(int col = 0; col < enemyCols; col++){
+
+                cellCounters[row][col] = initialCounter;
+            }
+        }
+    }
+
+    private int getInitialCellCounter(){
+
+        if(level == 1){
+            return 2;
+        }
+        else if(level == 2){
+            return 2;
+        }
+        else if(level == 3){
+            return 3;
+        }
+        else if(level == 5){
+            return 3;
+        }
+        else if(level == 6){
+            return 4;
+        }
+        else if(level == 7){
+            return 4;
+        }
+
+        return 0;
+    }
+
+    private Enemy createEnemyForCell(int row, int col){
+
+        int enemyX = enemyStartX + col * enemyGapX;
+
+        int enemyY = enemyStartY + row * enemyGapY;
+
+        String enemyType = chooseEnemyType(row, col);
+
+        Enemy enemy = new Enemy(enemyX, enemyY, enemyType, level, row, col);
+
+        return enemy;
+    }
+
     public void createEnemies(){
 
-        int rows = 5;
-        int cols = 8;
+        for(int row = 0; row < enemyRows; row++){
 
-        int startX = 80;
-        int startY = 80;
+            for(int col = 0; col < enemyCols; col++){
 
-        int gapX = 80;
-        int gapY = 55;
-
-        for(int row=0 ; row < rows; ++row){
-            for(int col=0; col < cols; ++col){
-
-                int enemyX = startX + col * gapX;
-                int enemyY = startY + row * gapY;
-
-                String enemyType = chooseEnemyType(row, col);
-
-                Enemy enemy = new Enemy(enemyX,enemyY,enemyType,level);
+                Enemy enemy = createEnemyForCell(row, col);
 
                 enemies.add(enemy);
             }
@@ -553,6 +608,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             createBoss();
         }
         else{
+            setupCellCounters();
+
             createEnemies();
         }
 
@@ -976,7 +1033,20 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                         spawnPowerUp(enemyBoundsForPowerUp.x, enemyBoundsForPowerUp.y);
 
+                        int cellRow = enemy.getCellRow();
+
+                        int cellCol = enemy.getCellCol();
+
+                        cellCounters[cellRow][cellCol]--;
+
                         enemies.remove(j);
+
+                        if(cellCounters[cellRow][cellCol] > 0){
+
+                            Enemy newEnemy = createEnemyForCell(cellRow, cellCol);
+
+                            enemies.add(newEnemy);
+                        }
                     }
 
                     break;

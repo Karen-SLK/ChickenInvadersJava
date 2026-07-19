@@ -27,6 +27,9 @@ public class Enemy {
 
     private int zigzagCounter = 0;
 
+    private int cellRow;
+
+    private int cellCol;
 
 
     public Enemy(int x, int y, String type, int level){
@@ -37,6 +40,17 @@ public class Enemy {
         this.type = type;
 
         setupStats(level);
+
+        this.cellRow = -1;
+        this.cellCol = -1;
+    }
+
+    public Enemy(int x, int y, String type, int level, int cellRow, int cellCol){
+
+        this(x, y, type, level);
+
+        this.cellRow = cellRow;
+        this.cellCol = cellCol;
     }
 
     private void setupStats(int level){
@@ -190,5 +204,13 @@ public class Enemy {
 
     public int getHeight(){
         return height;
+    }
+
+    public int getCellRow(){
+        return cellRow;
+    }
+
+    public int getCellCol(){
+        return cellCol;
     }
 }
