@@ -31,6 +31,14 @@ public class Enemy {
 
     private int cellCol;
 
+    private int targetX;
+
+    private int targetY;
+
+    private boolean movingToCell;
+
+    private int enterSpeed = 4;
+
 
     public Enemy(int x, int y, String type, int level){
 
@@ -51,6 +59,11 @@ public class Enemy {
 
         this.cellRow = cellRow;
         this.cellCol = cellCol;
+
+        this.targetX = x;
+        this.targetY = y;
+
+        this.movingToCell = false;
     }
 
     private void setupStats(int level){
@@ -212,5 +225,42 @@ public class Enemy {
 
     public int getCellCol(){
         return cellCol;
+    }
+
+    public void setTargetCellPosition(int targetX, int targetY){
+
+        this.targetX = targetX;
+        this.targetY = targetY;
+    }
+
+    public void setMovingToCell(boolean movingToCell){
+
+        this.movingToCell = movingToCell;
+    }
+
+    public boolean isMovingToCell(){
+
+        return movingToCell;
+    }
+
+    public void moveToTargetCell(){
+
+        int dx = targetX - x;
+        int dy = targetY - y;
+
+        double distance = Math.sqrt(dx * dx + dy * dy);
+
+        if(distance <= enterSpeed){
+
+            x = targetX;
+            y = targetY;
+
+            movingToCell = false;
+
+            return;
+        }
+
+        x += (int)Math.round(enterSpeed * dx / distance);
+        y += (int)Math.round(enterSpeed * dy / distance);
     }
 }

@@ -113,6 +113,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private int[][] cellCounters;
 
+    private int enemyGridOffsetX = 0;
+
+    private int enemyGridOffsetY = 0;
+
     public GamePanel(GameMain gameMain){
 
         this.gameMain = gameMain;
@@ -193,6 +197,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         scoreSaved = false;
 
         enemyDirection = 1;
+
+        enemyGridOffsetX = 0;
+        enemyGridOffsetY = 0;
 
         setupLevel();
 
@@ -326,9 +333,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private Enemy createEnemyForCell(int row, int col){
 
-        int enemyX = enemyStartX + col * enemyGapX;
+        int enemyX = getEnemyCellX(col);
 
-        int enemyY = enemyStartY + row * enemyGapY;
+        int enemyY = getEnemyCellY(row);
 
         String enemyType = chooseEnemyType(row, col);
 
@@ -602,6 +609,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         enemyDirection = 1;
 
+        enemyGridOffsetX = 0;
+        enemyGridOffsetY = 0;
+
         setupLevel();
 
         if(isBossLevel()){
@@ -626,9 +636,14 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             return;
         }
 
-        for(int i = 0; i<enemies.size(); ++i){
+        for(int i = 0; i < enemies.size(); i++){
 
             Enemy enemy = enemies.get(i);
+
+            if(enemy.isMovingToCell()){
+
+                continue;
+            }
 
             if(enemy.getY() + enemy.getHeight() >= getHeight()){
 
@@ -680,6 +695,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
             Enemy enemy = enemies.get(i);
 
+            if(enemy.isMovingToCell()){
+
+                continue;
+            }
+
             if(enemy.getType().equals(Enemy.SHOOTER)){
                 shooters.add(enemy);
             }
@@ -718,9 +738,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         );
 
         enemyBullets.add(enemyBullet);
+
         lastShooterShotTime = currentTime;
     }
-
     private void updateBullets(){
 
         for(int i = bullets.size() - 1; i>=0; --i){
@@ -752,31 +772,56 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private void updateEnemies(){
 
         boolean hitEdge = false;
+        boolean normalEnemyMoved = false;
 
-        for(int i=0; i<enemies.size(); ++i){
+        for(int i = 0; i < enemies.size(); i++){
 
             Enemy enemy = enemies.get(i);
 
+            if(enemy.isMovingToCell()){
+
+                int targetX = getEnemyCellX(enemy.getCellCol());
+                int targetY = getEnemyCellY(enemy.getCellRow());
+
+                enemy.setTargetCellPosition(targetX, targetY);
+
+                enemy.moveToTargetCell();
+
+                continue;
+            }
+
             enemy.update(enemyDirection, enemySpeed);
+            normalEnemyMoved = true;
 
             if(enemy.getX() < 0 || enemy.getX() + enemy.getWidth() > getWidth()){
+
                 hitEdge = true;
             }
+        }
+
+        if(normalEnemyMoved){
+            enemyGridOffsetX += enemyDirection * enemySpeed;
         }
 
         if(hitEdge){
 
             enemyDirection = enemyDirection * -1;
 
-            for(int i=0; i<enemies.size(); ++i){
+            for(int i = 0; i < enemies.size(); i++){
 
                 Enemy enemy = enemies.get(i);
 
+                if(enemy.isMovingToCell()){
+
+                    continue;
+                }
+
                 enemy.moveDown(enemyDownStep);
             }
+
+            enemyGridOffsetY += enemyDownStep;
         }
     }
-
     private void updateEggs(){
 
         for(int i = eggs.size() - 1; i>=0; i--){
@@ -803,20 +848,38 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             return;
         }
 
-        int enemyIndex = random.nextInt(enemies.size());
+        ArrayList<Enemy> readyEnemies = new ArrayList<>();
 
-        Enemy enemy = enemies.get(enemyIndex);
+        for(int i = 0; i < enemies.size(); i++){
+
+            Enemy enemy = enemies.get(i);
+
+            if(enemy.isMovingToCell()){
+
+                continue;
+            }
+
+            readyEnemies.add(enemy);
+        }
+
+        if(readyEnemies.size() == 0){
+            return;
+        }
+
+        int enemyIndex = random.nextInt(readyEnemies.size());
+
+        Enemy enemy = readyEnemies.get(enemyIndex);
 
         Rectangle enemyBounds = enemy.getBounds();
 
-        int eggX = enemyBounds.x + enemyBounds.width / 2 -5;
+        int eggX = enemyBounds.x + enemyBounds.width / 2 - 5;
         int eggY = enemyBounds.y + enemyBounds.height;
 
         Egg egg = new Egg(eggX, eggY);
 
         eggs.add(egg);
 
-        lastEggTime= currentTime;
+        lastEggTime = currentTime;
     }
 
     private void updatePowerUps(){
@@ -935,6 +998,41 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         enemyBullets.add(bullet);
     }
 
+    private Enemy createRespawnEnemyForCell(int row, int col){
+
+        int targetX = getEnemyCellX(col);
+        int targetY = getEnemyCellY(row);
+
+        String enemyType = chooseEnemyType(row, col);
+
+        int panelWidth = getWidth();
+
+        if(panelWidth <= 0){
+            panelWidth = 800;
+        }
+
+        int startX;
+
+        if(col < enemyCols / 2){
+
+            startX = -80;
+        }
+        else{
+
+            startX = panelWidth + 80;
+        }
+
+        int startY = 40;
+
+        Enemy enemy = new Enemy(startX, startY, enemyType, level, row, col);
+
+        enemy.setTargetCellPosition(targetX, targetY);
+
+        enemy.setMovingToCell(true);
+
+        return enemy;
+    }
+
     private void spawnPowerUp(int x, int y){
 
         int chance = random.nextInt(100);
@@ -1007,6 +1105,11 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                 Enemy enemy = enemies.get(j);
 
+                if(enemy.isMovingToCell()){
+
+                    continue;
+                }
+
                 Rectangle enemyBounds = enemy.getBounds();
 
                 if(bulletBounds.intersects(enemyBounds)){
@@ -1037,15 +1140,18 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                         int cellCol = enemy.getCellCol();
 
-                        cellCounters[cellRow][cellCol]--;
-
                         enemies.remove(j);
 
-                        if(cellCounters[cellRow][cellCol] > 0){
+                        if(cellRow >= 0 && cellRow < enemyRows && cellCol >= 0 && cellCol < enemyCols){
 
-                            Enemy newEnemy = createEnemyForCell(cellRow, cellCol);
+                            cellCounters[cellRow][cellCol]--;
 
-                            enemies.add(newEnemy);
+                            if(cellCounters[cellRow][cellCol] > 0){
+
+                                Enemy newEnemy = createRespawnEnemyForCell(cellRow, cellCol);
+
+                                enemies.add(newEnemy);
+                            }
                         }
                     }
 
@@ -1224,6 +1330,16 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         SoundManager.playShotSound();
 
         lastShotTime = currentTime;
+    }
+
+    private int getEnemyCellX(int col){
+
+        return enemyStartX + col * enemyGapX + enemyGridOffsetX;
+    }
+
+    private int getEnemyCellY(int row){
+
+        return enemyStartY + row * enemyGapY + enemyGridOffsetY;
     }
 
     private void keepPlaneInsideWindow(){
