@@ -3,6 +3,7 @@ package chickeninvaders;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 public class Boss {
 
@@ -60,6 +61,29 @@ public class Boss {
     }
 
     public void draw(Graphics g){
+
+        BufferedImage bossImage = null;
+
+        if(level == 4){
+            bossImage = ImageManager.getBossLevel4Image();
+        }
+        else if(level == 8){
+            bossImage = ImageManager.getBossLevel8Image();
+        }
+
+        if(bossImage != null){
+
+            g.drawImage(
+                    bossImage,
+                    x,
+                    y,
+                    width,
+                    height,
+                    null
+            );
+
+            return;
+        }
 
         if(level == 4){
             g.setColor(Color.ORANGE);

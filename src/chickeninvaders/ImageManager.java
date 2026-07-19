@@ -18,6 +18,9 @@ public class ImageManager {
     private static BufferedImage zigzagChickenImage;
     private static BufferedImage shooterChickenImage;
 
+    private static BufferedImage bossLevel4Image;
+    private static BufferedImage bossLevel8Image;
+
     public static void loadImages(){
 
         backgroundImage = loadImage("assets/image/background.png");
@@ -37,6 +40,10 @@ public class ImageManager {
         zigzagChickenImage = loadImage("assets/image/zigzag_chicken.png");
 
         shooterChickenImage = loadImage("assets/image/shooter_chicken.png");
+
+        bossLevel4Image = loadImage("assets/image/boss1.png");
+
+        bossLevel8Image = loadImage("assets/image/boss2.png");
     }
 
     private static BufferedImage loadImage(String filePath){
@@ -90,6 +97,14 @@ public class ImageManager {
 
     public static BufferedImage getShooterChickenImage(){
         return shooterChickenImage;
+    }
+
+    public static BufferedImage getBossLevel4Image(){
+        return bossLevel4Image;
+    }
+
+    public static BufferedImage getBossLevel8Image(){
+        return bossLevel8Image;
     }
 
 
