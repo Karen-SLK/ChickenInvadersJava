@@ -1091,7 +1091,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                     explosions.add(explosion);
 
-                    SoundManager.playExplosionSound();
+                    SoundManager.playBossDeadSound();
 
                     score += boss.getScoreValue();
 
@@ -1127,7 +1127,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                         explosions.add(explosion);
 
-                        SoundManager.playExplosionSound();
+                        SoundManager.playChickenDeadSound();
 
                         spawnPowerUp(enemyBoundsForPowerUp.x, enemyBoundsForPowerUp.y);
 

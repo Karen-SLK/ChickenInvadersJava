@@ -92,7 +92,21 @@ public class SoundManager {
     public static void playShotSound(){
 
         if(SoundSettings.isShotSoundOn()){
-            playSound("assets/sounds/shot.wav");
+            playSound("assets/sounds/defaultweapon.wav");
+        }
+    }
+
+    public static void playChickenDeadSound(){
+
+        if(SoundSettings.isExplosionSoundOn()){
+            playSound("assets/sounds/chicken1.wav");
+        }
+    }
+
+    public static void playBossDeadSound(){
+
+        if(SoundSettings.isExplosionSoundOn()){
+            playSound("assets/sounds/chickbossDie.wav");
         }
     }
 
