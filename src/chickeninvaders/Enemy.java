@@ -39,7 +39,6 @@ public class Enemy {
 
     private int enterSpeed = 4;
 
-
     public Enemy(int x, int y, String type, int level){
 
         this.x = x;

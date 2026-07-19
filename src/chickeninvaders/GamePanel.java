@@ -1105,11 +1105,6 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                 Enemy enemy = enemies.get(j);
 
-                if(enemy.isMovingToCell()){
-
-                    continue;
-                }
-
                 Rectangle enemyBounds = enemy.getBounds();
 
                 if(bulletBounds.intersects(enemyBounds)){
@@ -1434,7 +1429,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             status += "Freeze ";
         }
 
-        g.drawString(status, 20, 55);
+        if(!status.equals("")){
+            g.drawString(status, 20, 100);
+        }
     }
 
     private void drawEnemies(Graphics g){
