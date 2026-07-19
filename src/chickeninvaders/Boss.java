@@ -28,34 +28,46 @@ public class Boss {
 
         this.level = level;
 
-        x = panelWidth / 2 - width / 2;
-        y = 60;
-
         if(level == 4){
+            width = 220;
+            height = 130;
+
             maxHealth = 50;
-            speed = 2;
+            health = maxHealth;
+
             scoreValue = 500;
+
+            speed = 3;
         }
         else{
+            width = 260;
+            height = 150;
+
             maxHealth = 100;
-            speed = 3;
+            health = maxHealth;
+
             scoreValue = 1000;
+
+            speed = 4;
         }
 
-        health = maxHealth;
+        x = panelWidth / 2 - width / 2;
+        y = 90;
+
+        direction = 1;
     }
 
-    public void update(int panelwidth){
+    public void update(int panelWidth){
 
         x += direction * speed;
 
-        if(x < 0){
+        if(x <= 0){
             x = 0;
             direction = 1;
         }
 
-        if(x + width > panelwidth){
-            x = panelwidth - width;
+        if(x + width >= panelWidth){
+            x = panelWidth - width;
             direction = -1;
         }
     }
@@ -82,6 +94,8 @@ public class Boss {
                     null
             );
 
+            drawHealthBar(g);
+
             return;
         }
 
@@ -105,16 +119,25 @@ public class Boss {
         int barWidth = width;
         int barHeight = 10;
 
-        int healthWidth = (int)((double)health / maxHealth *barWidth);
+        int barX = x;
+        int barY = y + height + 10;
 
-        g.setColor(Color.GRAY);
-        g.fillRect(x, y-18, barWidth, barHeight);
+        double healthPercent = (double) health / maxHealth;
+
+        if(healthPercent < 0){
+            healthPercent = 0;
+        }
+
+        int currentBarWidth = (int)(barWidth * healthPercent);
+
+        g.setColor(Color.RED);
+        g.fillRect(barX, barY, barWidth, barHeight);
 
         g.setColor(Color.GREEN);
-        g.fillRect(x, y-18, healthWidth, barHeight);
+        g.fillRect(barX, barY, currentBarWidth, barHeight);
 
         g.setColor(Color.WHITE);
-        g.drawRect(x, y - 18, barWidth, barHeight);
+        g.drawRect(barX, barY, barWidth, barHeight);
     }
 
     public boolean hit(){
