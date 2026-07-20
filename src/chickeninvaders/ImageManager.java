@@ -7,7 +7,6 @@ import java.io.File;
 public class ImageManager {
 
     private static BufferedImage backgroundImage;
-    private static BufferedImage airplaneImage;
     private static BufferedImage shotImage;
 
     private static BufferedImage eggImage;
@@ -21,11 +20,14 @@ public class ImageManager {
     private static BufferedImage bossLevel4Image;
     private static BufferedImage bossLevel8Image;
 
+    private static BufferedImage planeDefaultImage;
+    private static BufferedImage planeFastImage;
+    private static BufferedImage planeHeavyImage;
+    private static BufferedImage planeSniperImage;
+
     public static void loadImages(){
 
         backgroundImage = loadImage("assets/image/background.png");
-
-        airplaneImage = loadImage("assets/image/1.png");
 
         shotImage = loadImage("assets/image/shot.png");
 
@@ -44,6 +46,11 @@ public class ImageManager {
         bossLevel4Image = loadImage("assets/image/boss1.png");
 
         bossLevel8Image = loadImage("assets/image/boss2.png");
+
+        planeDefaultImage = loadImage("assets/image/1.png");
+        planeFastImage = loadImage("assets/image/4.png");
+        planeHeavyImage = loadImage("assets/image/5.png");
+        planeSniperImage = loadImage("assets/image/6.png");
     }
 
     private static BufferedImage loadImage(String filePath){
@@ -65,10 +72,6 @@ public class ImageManager {
 
     public static BufferedImage getBackgroundImage(){
         return backgroundImage;
-    }
-
-    public static BufferedImage getAirplaneImage(){
-        return airplaneImage;
     }
 
     public static BufferedImage getShotImage(){
@@ -105,6 +108,22 @@ public class ImageManager {
 
     public static BufferedImage getBossLevel8Image(){
         return bossLevel8Image;
+    }
+
+    public static BufferedImage getPlaneDefaultImage(){
+        return planeDefaultImage;
+    }
+
+    public static BufferedImage getPlaneFastImage(){
+        return planeFastImage;
+    }
+
+    public static BufferedImage getPlaneHeavyImage(){
+        return planeHeavyImage;
+    }
+
+    public static BufferedImage getPlaneSniperImage(){
+        return planeSniperImage;
     }
 
 

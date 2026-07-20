@@ -8,6 +8,7 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import javax.swing.*;
 import java.util.Random;
+import java.awt.image.BufferedImage;
 
 
 public class GamePanel extends JPanel implements KeyListener, ActionListener {
@@ -117,6 +118,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private int enemyGridOffsetY = 0;
 
+    private String selectedPlane = PlaneType.DEFAULT;
+
+    private boolean sniperPlaneActive;
+
     public GamePanel(GameMain gameMain){
 
         this.gameMain = gameMain;
@@ -177,6 +182,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         lives = 3;
 
         fireLevel = 1;
+
+        applySelectedPlaneSettings();
 
         rapidFireActive = false;
 
@@ -986,6 +993,30 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
        lastBossShotTime = currentTime;
     }
 
+    private void applySelectedPlaneSettings(){
+
+        User currentUser = gameMain.getCurrentUser();
+
+        if(currentUser != null){
+            selectedPlane = currentUser.getSelectedPlane();
+        }
+        else{
+            selectedPlane = PlaneType.DEFAULT;
+        }
+
+        if(!PlaneType.isValidPlane(selectedPlane)){
+            selectedPlane = PlaneType.DEFAULT;
+        }
+
+        planeSpeed = PlaneType.getSpeed(selectedPlane);
+
+        shotDelay = PlaneType.getShotDelay(selectedPlane);
+
+        lives = PlaneType.getInitialLives(selectedPlane);
+
+        sniperPlaneActive = PlaneType.isSniper(selectedPlane);
+    }
+
     private void addBossBullet(int x, int y, int speedX, int speedY){
 
         EnemyBullet bullet = new EnemyBullet(
@@ -1078,7 +1109,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
                 bullets.remove(i);
 
-                boolean bossDead = boss.hit();
+                int bossDamage = 1;
+
+                if(sniperPlaneActive){
+                    bossDamage = 2;
+                }
+
+                boolean bossDead = boss.hit(bossDamage);
 
                 if(bossDead){
 
@@ -1387,6 +1424,21 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
     }
 
+    private BufferedImage getSelectedPlaneImage(){
+
+        if(selectedPlane.equals(PlaneType.FAST)){
+            return ImageManager.getPlaneFastImage();
+        }
+        else if(selectedPlane.equals(PlaneType.HEAVY)){
+            return ImageManager.getPlaneHeavyImage();
+        }
+        else if(selectedPlane.equals(PlaneType.SNIPER)){
+            return ImageManager.getPlaneSniperImage();
+        }
+
+        return ImageManager.getPlaneDefaultImage();
+    }
+
     private void drawHud(Graphics g){
 
         g.setColor(Color.WHITE);
@@ -1409,11 +1461,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         g.drawString("Fire: " + fireLevel, 360, 50);
 
+        g.drawString("Plane: " + selectedPlane, 20, 75);
+
         g.drawString("SPACE: shoot", 470, 50);
 
         g.drawString("P: pause", 630, 50);
 
-        g.drawString("ESC: menu", 630, 75);
+        g.drawString("ESC: menu", 630, 100);
 
         String status = "";
 
@@ -1430,7 +1484,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         }
 
         if(!status.equals("")){
-            g.drawString(status, 20, 100);
+            g.drawString(status, 20, 125);
         }
     }
 
@@ -1465,10 +1519,12 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private void drawPlane(Graphics g){
 
-        if(ImageManager.getAirplaneImage() != null){
+        BufferedImage planeImage = getSelectedPlaneImage();
+
+        if(planeImage != null){
 
             g.drawImage(
-                    ImageManager.getAirplaneImage(),
+                    planeImage,
                     planeX,
                     planeY,
                     planeWidth,
@@ -1477,6 +1533,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             );
         }
         else{
+
             g.setColor(Color.CYAN);
 
             int[] xPoints = {planeX + planeWidth / 2, planeX, planeX + planeWidth};

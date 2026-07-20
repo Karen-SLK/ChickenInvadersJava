@@ -25,9 +25,9 @@ public class UserManager {
         String sql =
                 "INSERT INTO users ("
                         + "username, password, highest_score, last_level, "
-                        + "background_music_on, shot_sound_on, explosion_sound_on, game_result_sound_on"
-                        + ") VALUES (?, ?, 0, 1, 1, 1, 1, 1)";
-
+                        + "background_music_on, shot_sound_on, explosion_sound_on, game_result_sound_on, "
+                        + "selected_plane"
+                        + ") VALUES (?, ?, 0, 1, 1, 1, 1, 1, ?)";
         try{
 
             Connection connection = DatabaseManager.getConnection();
@@ -40,6 +40,7 @@ public class UserManager {
 
             statement.setString(1, username);
             statement.setString(2, password);
+            statement.setString(3, PlaneType.DEFAULT);
 
             statement.executeUpdate();
 
@@ -142,7 +143,8 @@ public class UserManager {
                         + "background_music_on = ?, "
                         + "shot_sound_on = ?, "
                         + "explosion_sound_on = ?, "
-                        + "game_result_sound_on = ? "
+                        + "game_result_sound_on = ?, "
+                        + "selected_plane = ? "
                         + "WHERE username = ?";
 
         try{
@@ -162,7 +164,8 @@ public class UserManager {
             statement.setInt(5, booleanToInt(updatedUser.isShotSoundOn()));
             statement.setInt(6, booleanToInt(updatedUser.isExplosionSoundOn()));
             statement.setInt(7, booleanToInt(updatedUser.isGameResultSoundOn()));
-            statement.setString(8, updatedUser.getUsername());
+            statement.setString(8, updatedUser.getSelectedPlane());
+            statement.setString(9, updatedUser.getUsername());
 
             statement.executeUpdate();
 
@@ -218,6 +221,7 @@ public class UserManager {
 
             String username = resultSet.getString("username");
             String password = resultSet.getString("password");
+            String selectedPlane = resultSet.getString("selected_plane");
 
             int highestScore = resultSet.getInt("highest_score");
             int lastLevel = resultSet.getInt("last_level");
@@ -235,7 +239,8 @@ public class UserManager {
                     backgroundMusicOn,
                     shotSoundOn,
                     explosionSoundOn,
-                    gameResultSoundOn
+                    gameResultSoundOn,
+                    selectedPlane
             );
         }
         catch(Exception e){
@@ -270,4 +275,6 @@ public class UserManager {
 
         return text;
     }
+
+
 }

@@ -109,6 +109,14 @@ public class MainMenu extends JPanel{
         gbc.gridy = 5;
 
         add(exitButton,gbc);
+
+        JButton storeButton = createMenuButton("Store");
+
+        gbc.gridy = 6;
+
+        add(storeButton,gbc);
+
+        storeButton.addActionListener(e -> showStore());
     }
 
     private void showHighScores(){
@@ -372,5 +380,75 @@ public class MainMenu extends JPanel{
                 gameMain.startNewGame();
             }
         }
+    }
+
+    private void showStore(){
+
+        User currentUser = gameMain.getCurrentUser();
+
+        if(currentUser == null){
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please login or register first."
+            );
+
+            return;
+        }
+
+        String[] planes = PlaneType.getAllPlanes();
+
+        StringBuilder message = new StringBuilder();
+
+        message.append("Your highest score: ")
+                .append(currentUser.getHighestScore())
+                .append("\n");
+
+        message.append("Current plane: ")
+                .append(currentUser.getSelectedPlane())
+                .append("\n\n");
+
+        message.append("Available planes:\n");
+
+        for(int i = 0; i < planes.length; i++){
+            message.append(PlaneType.getInfoText(planes[i]))
+                    .append("\n");
+        }
+
+        String selectedPlane = (String) JOptionPane.showInputDialog(
+                this,
+                message.toString(),
+                "Store",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                planes,
+                currentUser.getSelectedPlane()
+        );
+
+        if(selectedPlane == null){
+
+            return;
+        }
+
+        int cost = PlaneType.getCost(selectedPlane);
+
+        if(currentUser.getHighestScore() < cost){
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "You need at least " + cost + " points to unlock " + selectedPlane + "."
+            );
+
+            return;
+        }
+
+        currentUser.setSelectedPlane(selectedPlane);
+
+        UserManager.updateUser(currentUser);
+
+        JOptionPane.showMessageDialog(
+                this,
+                selectedPlane + " plane selected for next game."
+        );
     }
 }

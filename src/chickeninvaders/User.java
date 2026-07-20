@@ -18,6 +18,8 @@ public class User {
 
     private boolean gameResultSoundOn;
 
+    private String selectedPlane;
+
     public User(String username, String password){
 
         this.username = username;
@@ -31,20 +33,32 @@ public class User {
         shotSoundOn = true;
         explosionSoundOn = true;
         gameResultSoundOn = true;
+
+        this.selectedPlane = PlaneType.DEFAULT;
     }
 
     public User(String username, String password, int highestScore, int lastLevel,
                 boolean backgroundMusicOn, boolean shotSoundOn,
-                boolean explosionSoundOn, boolean gameResultSoundOn){
+                boolean explosionSoundOn, boolean gameResultSoundOn,
+                String selectedPlane){
 
         this.username = username;
         this.password = password;
+
         this.highestScore = highestScore;
         this.lastLevel = lastLevel;
+
         this.backgroundMusicOn = backgroundMusicOn;
         this.shotSoundOn = shotSoundOn;
         this.explosionSoundOn = explosionSoundOn;
         this.gameResultSoundOn = gameResultSoundOn;
+
+        if(PlaneType.isValidPlane(selectedPlane)){
+            this.selectedPlane = selectedPlane;
+        }
+        else{
+            this.selectedPlane = PlaneType.DEFAULT;
+        }
     }
 
     public String getUsername(){
@@ -101,6 +115,21 @@ public class User {
 
     public void setGameResultSoundOn(boolean gameResultSoundOn){
         this.gameResultSoundOn = gameResultSoundOn;
+    }
+
+    public String getSelectedPlane(){
+
+        return selectedPlane;
+    }
+
+    public void setSelectedPlane(String selectedPlane){
+
+        if(PlaneType.isValidPlane(selectedPlane)){
+            this.selectedPlane = selectedPlane;
+        }
+        else{
+            this.selectedPlane = PlaneType.DEFAULT;
+        }
     }
 
     public String toFileString(){

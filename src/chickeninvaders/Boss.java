@@ -142,7 +142,12 @@ public class Boss {
 
     public boolean hit(){
 
-        health--;
+        return hit(1);
+    }
+
+    public boolean hit(int damage){
+
+        health -= damage;
 
         return health <= 0;
     }
