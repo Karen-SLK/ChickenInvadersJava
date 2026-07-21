@@ -30,6 +30,12 @@ public class ImageManager {
     private static BufferedImage planeHeavyImage;
     private static BufferedImage planeSniperImage;
 
+    private static BufferedImage powerExtraLifeImage;
+    private static BufferedImage powerAddFireImage;
+    private static BufferedImage powerRapidFireImage;
+    private static BufferedImage powerShieldImage;
+    private static BufferedImage powerFreezeBombImage;
+
     public static void loadImages(){
 
         backgroundImage = loadImage("assets/image/background.png");
@@ -56,6 +62,12 @@ public class ImageManager {
         planeFastImage = loadImage("assets/image/4.png");
         planeHeavyImage = loadImage("assets/image/5.png");
         planeSniperImage = loadImage("assets/image/6.png");
+
+        powerExtraLifeImage = loadImage("assets/image/health.png");
+        powerAddFireImage = loadImage("assets/image/addfire.png");
+        powerRapidFireImage = loadImage("assets/image/rapidfire.png");
+        powerShieldImage = loadImage("assets/image/shield.png");
+        powerFreezeBombImage = loadImage("assets/image/freeze.png");
     }
 
     private static BufferedImage loadImage(String filePath){
@@ -129,6 +141,26 @@ public class ImageManager {
 
     public static BufferedImage getPlaneSniperImage(){
         return planeSniperImage;
+    }
+
+    public static BufferedImage getPowerExtraLifeImage(){
+        return powerExtraLifeImage;
+    }
+
+    public static BufferedImage getPowerAddFireImage(){
+        return powerAddFireImage;
+    }
+
+    public static BufferedImage getPowerRapidFireImage(){
+        return powerRapidFireImage;
+    }
+
+    public static BufferedImage getPowerShieldImage(){
+        return powerShieldImage;
+    }
+
+    public static BufferedImage getPowerFreezeBombImage(){
+        return powerFreezeBombImage;
     }
 
 

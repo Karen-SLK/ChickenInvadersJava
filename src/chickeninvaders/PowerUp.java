@@ -3,6 +3,10 @@ package chickeninvaders;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.awt.Graphics2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 
 /*
  * Represents collectible power-ups that fall during gameplay.
@@ -41,43 +45,96 @@ public class PowerUp {
 
     public void draw(Graphics g){
 
+        BufferedImage powerUpImage = getPowerUpImage();
+
+        if(powerUpImage != null){
+
+            Graphics2D g2 = (Graphics2D) g.create();
+
+            Ellipse2D.Double circleClip = new Ellipse2D.Double(x, y, width, height);
+
+            g2.setClip(circleClip);
+
+            g2.drawImage(
+                    powerUpImage,
+                    x,
+                    y,
+                    width,
+                    height,
+                    null
+            );
+
+            g2.dispose();
+
+            return;
+        }
+
+
         if(type.equals(EXTRA_LIFE)){
             g.setColor(Color.PINK);
         }
-        else if(type.equals(ADD_FIRE)) {
-            g.setColor(Color.MAGENTA);
+        else if(type.equals(ADD_FIRE)){
+            g.setColor(Color.ORANGE);
         }
         else if(type.equals(RAPID_FIRE)){
             g.setColor(Color.YELLOW);
         }
-        else if(type.equals(SHIELD)) {
+        else if(type.equals(SHIELD)){
             g.setColor(Color.CYAN);
         }
         else if(type.equals(FREEZE_BOMB)){
             g.setColor(Color.BLUE);
         }
+        else{
+            g.setColor(Color.WHITE);
+        }
 
         g.fillOval(x, y, width, height);
 
-        g.setColor(Color.WHITE);
+        g.setColor(Color.BLACK);
+        g.drawString(getPowerUpLetter(), x + width / 2 - 4, y + height / 2 + 5);
+    }
 
-        if (type.equals(EXTRA_LIFE)) {
+    private BufferedImage getPowerUpImage(){
 
-            g.drawString("+", x + 8, y + 18);
+        if(type.equals(EXTRA_LIFE)){
+            return ImageManager.getPowerExtraLifeImage();
         }
-        else if (type.equals(ADD_FIRE)) {
+        else if(type.equals(ADD_FIRE)){
+            return ImageManager.getPowerAddFireImage();
+        }
+        else if(type.equals(RAPID_FIRE)){
+            return ImageManager.getPowerRapidFireImage();
+        }
+        else if(type.equals(SHIELD)){
+            return ImageManager.getPowerShieldImage();
+        }
+        else if(type.equals(FREEZE_BOMB)){
+            return ImageManager.getPowerFreezeBombImage();
+        }
 
-            g.drawString("F", x + 8, y + 18);
+        return null;
+    }
+
+    private String getPowerUpLetter(){
+
+        if(type.equals(EXTRA_LIFE)){
+            return "+";
         }
-        else if (type.equals(RAPID_FIRE)) {
-            g.drawString("R", x + 8, y + 18);
+        else if(type.equals(ADD_FIRE)){
+            return "F";
         }
-        else if (type.equals(SHIELD)) {
-            g.drawString("S", x + 8, y + 18);
+        else if(type.equals(RAPID_FIRE)){
+            return "R";
         }
-        else if (type.equals(FREEZE_BOMB)) {
-            g.drawString("Z", x + 8, y + 18);
+        else if(type.equals(SHIELD)){
+            return "S";
         }
+        else if(type.equals(FREEZE_BOMB)){
+            return "*";
+        }
+
+        return "?";
     }
 
     public boolean isOutOfScreen(int panelHeight){
