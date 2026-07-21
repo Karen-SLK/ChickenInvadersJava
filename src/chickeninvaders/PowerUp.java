@@ -4,6 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
+/*
+ * Represents collectible power-ups that fall during gameplay.
+ * Each power-up has a type and changes player abilities such as life, fire level, shield, rapid fire, or freeze.
+ */
+
 public class PowerUp {
 
     public static final String EXTRA_LIFE = "EXTRA_LIFE";

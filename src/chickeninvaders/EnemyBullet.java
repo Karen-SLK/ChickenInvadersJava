@@ -4,6 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
+/*
+ * Represents bullets fired by shooter enemies or bosses.
+ * It moves with horizontal and vertical speed values and checks when it leaves the screen.
+ */
+
 public class EnemyBullet {
 
     private int x;

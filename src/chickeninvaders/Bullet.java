@@ -4,6 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
+/*
+ * Represents a bullet fired by the player.
+ * It moves upward each frame and provides bounds for collision detection.
+ */
+
 public class Bullet {
 
     private int x;

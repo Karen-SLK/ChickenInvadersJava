@@ -1,5 +1,10 @@
 package chickeninvaders;
 
+/*
+ * Stores one high score record for display in the High Scores menu.
+ * It keeps the player name, score, reached level, and played date/time.
+ */
+
 public class HighScore {
 
     private String playerName;

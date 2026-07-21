@@ -4,6 +4,11 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
+/*
+ * Loads and stores all image assets used by the game.
+ * Other classes get player, enemy, airplanes, boss, bullet, egg, background, and power-up images from here.
+ */
+
 public class ImageManager {
 
     private static BufferedImage backgroundImage;

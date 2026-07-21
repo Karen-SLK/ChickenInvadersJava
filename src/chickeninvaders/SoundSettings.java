@@ -1,5 +1,10 @@
 package chickeninvaders;
 
+/*
+ * Stores global sound setting switches for the current game session.
+ * The menu and database update these values to enable or disable different sound categories.
+ */
+
 public class SoundSettings {
 
     private static boolean backgroundMusicOn = true;

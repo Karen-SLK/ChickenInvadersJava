@@ -10,6 +10,11 @@ import javax.swing.*;
 import java.util.Random;
 import java.awt.image.BufferedImage;
 
+/*
+ * This is the main gameplay panel and contains the core game loop.
+ * It updates the player, bullets, enemies, bosses, power-ups, collisions, levels, score, and game states.
+ * It also draws all game objects on the screen.
+ */
 
 public class GamePanel extends JPanel implements KeyListener, ActionListener {
 

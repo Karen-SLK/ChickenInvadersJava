@@ -5,6 +5,12 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
+/*
+ * Represents the boss enemy used in special levels.
+ * It stores boss health, movement, score value, attack behavior, and drawing logic.
+ * GamePanel updates this class and checks collisions with player bullets.
+ */
+
 public class Boss {
 
     private int x;

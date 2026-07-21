@@ -6,6 +6,10 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import java.awt.Dimension;
 
+/*
+ * Starts the main game window and controls screen navigation with CardLayout.
+ * It loads images, connects to the database, plays music, and switches between menu and game panel.
+ */
 
 public class GameMain {
 

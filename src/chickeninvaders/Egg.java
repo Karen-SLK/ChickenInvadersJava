@@ -4,6 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
+/*
+ * Represents an egg dropped by enemy chickens.
+ * It moves downward and can collide with the player to reduce lives.
+ */
+
 public class Egg {
 
     private int x;

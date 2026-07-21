@@ -1,5 +1,10 @@
 package chickeninvaders;
 
+/*
+ * Handles user registration, login, username checking, and user updates.
+ * It reads and writes user information in the SQLite users table.
+ */
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

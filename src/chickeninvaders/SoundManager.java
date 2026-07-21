@@ -3,6 +3,11 @@ package chickeninvaders;
 import javax.sound.sampled.*;
 import java.io.File;
 
+/*
+ * Loads and plays all game sound effects and background music.
+ * It checks SoundSettings before playing shot, explosion, boss, win, game over, and music sounds.
+ */
+
 public class SoundManager {
 
     private static Clip backgroundClip;

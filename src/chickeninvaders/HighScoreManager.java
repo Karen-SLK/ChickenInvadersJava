@@ -5,6 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
+/*
+ * Handles saving and loading game records from the SQLite database.
+ * It is used to store final game scores and return the best scores for the High Scores screen.
+ */
+
 public class HighScoreManager {
 
     public static void saveScore(String playerName, int score, int levelReached){

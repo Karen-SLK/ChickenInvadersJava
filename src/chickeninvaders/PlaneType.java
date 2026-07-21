@@ -1,5 +1,10 @@
 package chickeninvaders;
 
+/*
+* This class defines the available planes in the Store.
+* It provides each plane's cost, speed, shot delay, lives, and special ability.
+*/
+
 public class PlaneType {
 
     public static final String DEFAULT = "Default";

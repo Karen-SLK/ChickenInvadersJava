@@ -5,6 +5,11 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
+/*
+ * Represents normal enemy chickens in the game grid.
+ * It stores enemy type, health, score value, cell position, and movement behavior.
+ * It also supports respawn movement from the screen edge back to its target cell.
+ */
 
 public class Enemy {
 

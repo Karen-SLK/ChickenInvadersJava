@@ -6,6 +6,11 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import java.util.ArrayList;
 
+/*
+ * Builds the main menu user interface.
+ * It handles New Game, Login/Register, Settings, High Scores, How To Play, and Exit actions.
+ */
+
 public class MainMenu extends JPanel{
 
     private GameMain gameMain;

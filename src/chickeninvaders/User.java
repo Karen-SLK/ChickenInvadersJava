@@ -1,5 +1,10 @@
 package chickeninvaders;
 
+/*
+ * Represents a registered player account.
+ * It stores username, password, best score, last level, and saved sound settings.
+ */
+
 public class User {
 
     private String username;

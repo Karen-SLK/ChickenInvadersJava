@@ -3,6 +3,11 @@ package chickeninvaders;
 import java.awt.Color;
 import java.awt.Graphics;
 
+/*
+ * Represents a short visual explosion effect after collisions or enemy death.
+ * It updates frame by frame and removes itself when the animation is finished.
+ */
+
 public class Explosion {
 
     private int x;
