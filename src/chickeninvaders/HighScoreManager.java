@@ -59,7 +59,6 @@ public class HighScoreManager {
     public static ArrayList<HighScore> loadScores(){
 
         ArrayList<HighScore> scores = new ArrayList<>();
-        // List high score ha.
 
         String sql =
                 "SELECT username, score, level_reached, played_at "

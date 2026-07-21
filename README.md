@@ -20,6 +20,7 @@ The player controls a spaceship and must shoot enemy chickens, avoid eggs and en
 - Login and register system
 - SQLite database for users and game records
 - High score system
+- Airplanes store
 - Multiple enemy types:
     - Normal Chicken
     - Fast Chicken
@@ -74,6 +75,7 @@ shot_sound_on
 explosion_sound_on
 game_result_sound_on
 game_records
+selected_plane
 
 Stores each finished game record.
 
