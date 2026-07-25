@@ -412,16 +412,6 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             }
         }
 
-        if(level == 4){
-
-            if(col % 4 == 0){
-                return Enemy.SHOOTER;
-            }
-            else{
-                return Enemy.NORMAL;
-            }
-        }
-
         if(level == 5){
 
             if(col % 3 == 0){
@@ -458,16 +448,6 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             }
             else{
                 return Enemy.FAST;
-            }
-        }
-
-        if(level == 8){
-
-            if(col % 2 ==0){
-                return Enemy.SHOOTER;
-            }
-            else{
-                return Enemy.ZIGZAG;
             }
         }
 
@@ -898,7 +878,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         for(int i = powerUps.size() - 1; i>=0; --i){
 
-            PowerUp powerUp =   powerUps.get(i);
+            PowerUp powerUp = powerUps.get(i);
 
             powerUp.update();
 

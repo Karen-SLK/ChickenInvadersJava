@@ -6,7 +6,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
-import java.awt.image.BufferedImage;
 
 /*
  * Represents collectible power-ups that fall during gameplay.
